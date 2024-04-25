@@ -19,7 +19,7 @@ export async function getItineraryRecords(filters: Record<string, any>) {
         continue;
       }
 
-      const type = filters[key].every((item: any) => typeof item === 'string');
+      const type = filters[key].every((item: any) => typeof item === "string");
       if(type) {
         continue;
       } else {

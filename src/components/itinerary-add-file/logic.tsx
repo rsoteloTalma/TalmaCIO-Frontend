@@ -73,6 +73,24 @@ export async function processRecords(records: any[], file: File) {
       }
     }
 
+
+    if(element.ETA && element.ETD) {
+      element.ETA = new Date(numberToDate(element.ETA));
+      element.ETD = new Date(numberToDate(element.ETD));
+    }
+
+    if(element.ETA && (!element.ETD || element.ETD == "Invalid Date")) {
+        element.ETA = new Date(numberToDate(element.ETA));
+        const momentDate = moment(element.ETA).tz(timeZone).add(8, 'hours').format("YYYY-MM-DD HH:mm:ss");
+        element.ETD = new Date(momentDate);
+    }
+
+    if(element.ETD && (!element.ETA || element.ETA == "Invalid Date")) {
+      element.ETD = new Date(numberToDate(element.ETD));
+      const momentDate = moment(element.ETD).tz(timeZone).subtract(8, 'hours').format("YYYY-MM-DD HH:mm:ss");
+      element.ETA = new Date(momentDate);
+    }
+
     const record: ItineraryData = {
       ElementId: Number(index+=1),
       Base: element.Base,
@@ -84,8 +102,8 @@ export async function processRecords(records: any[], file: File) {
       IncomingFlight: String(element.VueloLlegando) ?? "",
       Destiny: element.Destino ?? "",
       OutgoingFlight: String(element.VueloSaliendo) ?? "",
-      EstimatedTimeArrival: new Date(numberToDate(element.ETA)),
-      EstimatedTimeDeparture: new Date(numberToDate(element.ETD)),
+      EstimatedTimeArrival: element.ETA,
+      EstimatedTimeDeparture: element.ETD,
       Terminal: element.Terminal != null ? element.Terminal.toString() : "",
       Gate: element.Gate != null ? element.Gate.toString() : "",
       Conveyor: element.Banda ?? "",
@@ -96,7 +114,6 @@ export async function processRecords(records: any[], file: File) {
     data.push(record);
   });
 
-  //File: "12345abcdef",
   const fileBase64 = await fileToBase64(file);
   const sendFile: ItineraryRequest = {
     FileName: file.name,

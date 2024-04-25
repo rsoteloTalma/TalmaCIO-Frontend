@@ -20,20 +20,21 @@ import SplitButton from "../../shared/fragments/split-button";
 import MessageSnackbar from "../../shared/fragments/message-snackbar";
 
 const user = getUser();
-const myBase = (user.operationAirportId == 27) ? 3 : user.operationAirportId;
 
 const ItineraryList: React.FC = () => {
+  const myBase = (user && user.operationAirportId == 27) ? 3 : user.operationAirportId;
+
   const [rowData, setRowData] = useState<any[]>([]);
   const [filters, setFilters] = useState<filterAll>();
   const [loading, setLoading] = useState<boolean>(true);
   const [openFilters, setOpenFilters] = useState<boolean>(false);
   const [params, setParams] = useState<Record<string, any>>({});
   const [load, setLoad] = useState<boolean>(false);
-  
+
   const [gridApi, setGridApi] = useState<GridApi | null>(null);
 
   //const [openDetails, setOpenDetails] = useState<boolean>(false);
-  
+
   const [openNew, setOpenNew] = useState<boolean>(false);
   const [openAlert, setOpenAlert] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
