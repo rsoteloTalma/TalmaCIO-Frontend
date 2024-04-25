@@ -73,7 +73,6 @@ export async function processRecords(records: any[], file: File) {
       }
     }
 
-
     if(element.ETA && element.ETD) {
       element.ETA = new Date(numberToDate(element.ETA));
       element.ETD = new Date(numberToDate(element.ETD));
@@ -81,14 +80,26 @@ export async function processRecords(records: any[], file: File) {
 
     if(element.ETA && (!element.ETD || element.ETD == "Invalid Date")) {
         element.ETA = new Date(numberToDate(element.ETA));
-        const momentDate = moment(element.ETA).tz(timeZone).add(8, 'hours').format("YYYY-MM-DD HH:mm:ss");
+        const momentDate = moment(element.ETA).tz(timeZone).add(8, "hours").format("YYYY-MM-DD HH:mm:ss");
         element.ETD = new Date(momentDate);
+
+        if(element.Observacion){
+          element.Observacion = `${element.Observacion} - ETD(default)`;
+        } else {
+          element.Observacion = "ETD(default)";
+        }
     }
 
     if(element.ETD && (!element.ETA || element.ETA == "Invalid Date")) {
       element.ETD = new Date(numberToDate(element.ETD));
-      const momentDate = moment(element.ETD).tz(timeZone).subtract(8, 'hours').format("YYYY-MM-DD HH:mm:ss");
+      const momentDate = moment(element.ETD).tz(timeZone).subtract(8, "hours").format("YYYY-MM-DD HH:mm:ss");
       element.ETA = new Date(momentDate);
+
+      if(element.Observacion){
+        element.Observacion = `${element.Observacion} - ETA(default)`;
+      } else {
+        element.Observacion = "ETA(default)";
+      }
     }
 
     const record: ItineraryData = {
@@ -107,7 +118,7 @@ export async function processRecords(records: any[], file: File) {
       Terminal: element.Terminal != null ? element.Terminal.toString() : "",
       Gate: element.Gate != null ? element.Gate.toString() : "",
       Conveyor: element.Banda ?? "",
-      Observation: element.Observation ?? "",
+      Observation: element.Observacion ?? "",
       Leaders: Leader
     }
 
@@ -194,6 +205,16 @@ export async function validationFields(records: any[]) {
 
     if (!element.Gate) {
       const message = `${row}_Gate sin indicar`;
+      alerts.push(message);
+    }
+
+    if(!element.ETA || element.ETA == "Invalid Date") {
+      const message = `${row}_ETA sin indicar`;
+      alerts.push(message);
+    }
+
+    if(!element.ETD || element.ETD == "Invalid Date") {
+      const message = `${row}_ETD sin indicar`;
       alerts.push(message);
     }
   });
