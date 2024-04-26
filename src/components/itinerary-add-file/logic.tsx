@@ -42,34 +42,38 @@ export async function processRecords(records: any[], file: File) {
 
   records.forEach((element, index) => {
     const Leader: any = [];
+    const separator = " ";
 
     if(element.LiderAT && element.LiderAT != ""){
-      const LeadAT = element.LiderAT.split(",");
+      const identification = String(element.LiderAT);
+      const LeadAT = (identification.includes(separator)) ? identification.split(separator) : [identification];
+
       if(LeadAT.length > 0){
-        const result = LeadAT.map((lead: string) => {
-          return { EmployeeId: lead.trim(), Type: 96 };
+        LeadAT.map((lead: string) => {
+          Leader.push({ EmployeeId: lead.trim(), Type: 96 });
         });
-        Leader.push(result);
       }
     }
 
     if(element.LiderPAX && element.LiderPAX != ""){
-      const LeadPAX = element.LiderPAX.split(",");
+      const identification = String(element.LiderPAX);
+      const LeadPAX = (identification.includes(separator)) ? identification.split(separator) : [identification];
+
       if(LeadPAX.length > 0){
-        const result = LeadPAX.map((lead: string) => {
-          return { EmployeeId: lead.trim(), Type: 97 };
+        LeadPAX.map((lead: string) => {
+          Leader.push({ EmployeeId: lead.trim(), Type: 97 });        
         });
-        Leader.push(result);        
       }
     }
 
     if(element.AOP && element.AOP != ""){
-      const LeadAOP = element.AOP.split(",");
+      const identification = String(element.AOP);
+      const LeadAOP = (identification.includes(separator)) ? identification.split(separator) : [identification];
+
       if(LeadAOP.length > 0){
-        const result = LeadAOP.map((lead: string) => {
-          return { EmployeeId: lead.trim(), Type: 98 };
+        LeadAOP.map((lead: string) => {
+          Leader.push({ EmployeeId: lead.trim(), Type: 98 });
         });
-        Leader.push(result);
       }
     }
 

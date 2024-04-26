@@ -41,11 +41,11 @@ const ItineraryAddFile: React.FC = () => {
     Object.keys(obj).forEach(key => {
       newObj[
         key.replace(/\s+/g, "")
-          .replace(/[áä]/gi, 'a')
-          .replace(/[éë]/gi, 'e')
-          .replace(/[íï]/gi, 'i')
-          .replace(/[óö]/gi, 'o')
-          .replace(/[úü]/gi, 'u')
+          .replace(/[áä]/gi, "a")
+          .replace(/[éë]/gi, "e")
+          .replace(/[íï]/gi, "i")
+          .replace(/[óö]/gi, "o")
+          .replace(/[úü]/gi, "u")
       ] = obj[key];
     });
     return newObj;
