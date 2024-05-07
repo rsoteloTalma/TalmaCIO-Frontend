@@ -16,16 +16,18 @@ import { ACTIONS, TITLES } from "../../../shared/constants";
 
 const ItineraryFilters: React.FC<FilterProps> = ({ open, handleClose, dataFilters, operation, handleFilter }) => {
 
+  const defaultAirport = ((dataFilters?.airports ?? []) as filterData[]).find((bid) => bid.id === operation);
+
   const [startDate, setStartDate] = useState<Dayjs | null>(dayjs());
   const [endDate, setEndDate] = useState<Dayjs | null>(dayjs());
-  const [base, setBase] = useState<any[]>([]);
+  const [base, setBase] = useState<any[]>([defaultAirport]);
   const [company, setCompany] = useState<any[]>([]);
   const [aircraft, setAircraft] = useState<any[]>([]);
-  const [serviceTypes, setServiceTypes] = useState<any[]>([]);
+  const [serviceType, setServiceType] = useState<any[]>([]);
   const [inputValueIn, setInputValueIn] = useState<string>("");
   const [inputValueOut, setInputValueOut] = useState<string>("");
-  const [incomingFlightNumber, SetIncomingFlightNumber] = useState<string[]>([]);
-  const [outgoingFlightNumber, SetOutgoingFlightNumber] = useState<string[]>([]);
+  const [incomingFlight, SetIncomingFlight] = useState<string[]>([]);
+  const [outgoingFlight, SetOutgoingFlight] = useState<string[]>([]);
 
   const handleIncomingChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInputValueIn(event.target.value);
@@ -33,7 +35,7 @@ const ItineraryFilters: React.FC<FilterProps> = ({ open, handleClose, dataFilter
 
   const handleIncomingKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter" && inputValueIn.trim() !== "") {
-      SetIncomingFlightNumber([...incomingFlightNumber, inputValueIn.trim()]);
+      SetIncomingFlight([...incomingFlight, inputValueIn.trim()]);
       setInputValueIn("");
     }
   };
@@ -44,28 +46,26 @@ const ItineraryFilters: React.FC<FilterProps> = ({ open, handleClose, dataFilter
 
   const handleOutgoingKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter" && inputValueOut.trim() !== "") {
-      SetOutgoingFlightNumber([...outgoingFlightNumber, inputValueOut.trim()]);
+      SetOutgoingFlight([...outgoingFlight, inputValueOut.trim()]);
       setInputValueOut("");
     }
   };
 
   const handleDeleteTag = (flight: string, type: boolean) => {
     if(type){
-      SetIncomingFlightNumber(incomingFlightNumber.filter((f) => f !== flight));
+      SetIncomingFlight(incomingFlight.filter((f) => f !== flight));
     } else {
-      SetOutgoingFlightNumber(outgoingFlightNumber.filter((f) => f !== flight));
+      SetOutgoingFlight(outgoingFlight.filter((f) => f !== flight));
     }
   };
-
-  const defaultAirport = ((dataFilters?.airports ?? []) as filterData[]).find((bid) => bid.id === operation);
 
   const resetStates = () => {
     setBase([defaultAirport]);
     setCompany([]);
     setAircraft([]);
-    setServiceTypes([]);
-    SetIncomingFlightNumber([]);
-    SetOutgoingFlightNumber([]);
+    setServiceType([]);
+    SetIncomingFlight([]);
+    SetOutgoingFlight([]);
     setStartDate(dayjs());
     setEndDate(dayjs());
   };
@@ -123,7 +123,7 @@ const ItineraryFilters: React.FC<FilterProps> = ({ open, handleClose, dataFilter
             multiple
             limitTags={2}
             id="multiple-base"
-            options={ (dataFilters?.airports ?? []) as filterData[] }
+            options={(Array.isArray(dataFilters?.airports) ? dataFilters.airports : []).filter((airport: filterData) => airport.extra == "True")}
             getOptionLabel={(option) => (option ? option.description ?? "" : "")}
             defaultValue={[defaultAirport]}
             renderInput={(params) => (
@@ -166,7 +166,7 @@ const ItineraryFilters: React.FC<FilterProps> = ({ open, handleClose, dataFilter
             isOptionEqualToValue={(option, value) => option.id === value.id}
           /> */}
 
-          <Autocomplete
+          {/* <Autocomplete
             multiple
             limitTags={2}
             id="multiple-aircraft-type"
@@ -181,7 +181,7 @@ const ItineraryFilters: React.FC<FilterProps> = ({ open, handleClose, dataFilter
             onChange={(event, newValue) => {
               setAircraft(newValue);
             }}
-          />
+          /> */}
 
           <Autocomplete
             multiple
@@ -194,9 +194,9 @@ const ItineraryFilters: React.FC<FilterProps> = ({ open, handleClose, dataFilter
             )}
             sx={{ width: "100%", marginBottom: 2 }}
             isOptionEqualToValue={(option, value) => option.id === value.id}
-            value={serviceTypes ?? []}
+            value={serviceType ?? []}
             onChange={(event, newValue) => {
-              setServiceTypes(newValue);
+              setServiceType(newValue);
             }}
           />
 
@@ -211,7 +211,7 @@ const ItineraryFilters: React.FC<FilterProps> = ({ open, handleClose, dataFilter
               sx={{marginRight: 2, width: "30%"}}
             />
             <Stack direction="row" spacing={1} marginTop={1}>
-              {incomingFlightNumber.map((flight, index) => (
+              {incomingFlight.map((flight, index) => (
                 <Chip
                   key={index}
                   label={flight}
@@ -232,7 +232,7 @@ const ItineraryFilters: React.FC<FilterProps> = ({ open, handleClose, dataFilter
               sx={{marginRight: 2, width: "30%"}}
             />
             <Stack direction="row" spacing={1} marginTop={1}>
-              {outgoingFlightNumber.map((flight, index) => (
+              {outgoingFlight.map((flight, index) => (
                 <Chip
                   key={index}
                   label={flight}
@@ -252,9 +252,9 @@ const ItineraryFilters: React.FC<FilterProps> = ({ open, handleClose, dataFilter
                 base,
                 company,
                 aircraft,
-                serviceTypes,
-                incomingFlightNumber,
-                outgoingFlightNumber
+                serviceType,
+                incomingFlight,
+                outgoingFlight
               }) }
             >
               {ACTIONS.FILTER}

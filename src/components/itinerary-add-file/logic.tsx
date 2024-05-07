@@ -112,7 +112,8 @@ export async function processRecords(records: any[], file: File) {
       AirlineIATA: element.IATA,
       ServiceType: element.TipoServicio,
       Registration: element.Matricula ?? "",
-      AircraftType: element.TipoAvion ?? "",
+      //AircraftType: element.TipoAvion ?? "",
+      AircraftType: null,
       Origin: element.Origen ?? "",
       IncomingFlight: String(element.VueloLlegando) ?? "",
       Destiny: element.Destino ?? "",
@@ -147,10 +148,16 @@ export async function validationFields(records: any[]) {
 
   let row = 0;
   records.forEach((element, index) => {
-    row = (index += 1);
+    row = (index += 2);
 
     if (!element.Base?.trim()) {
       const message = `${row}_Base sin indicar`;
+      errors.push(message);
+    }
+
+    const baseCheck = user.setAirports.find((item: any) => item.code === element.Base);
+    if (!baseCheck) {
+      const message = `${row}_Base no permitida`;
       errors.push(message);
     }
 
@@ -192,11 +199,6 @@ export async function validationFields(records: any[]) {
     }
 
     // ALERTS
-    if (!element.TipoAvion) {
-      const message = `${row}_Tipo de Avión sin indicar`;
-      alerts.push(message);
-    }
-
     if (!element.Matricula) {
       const message = `${row}_Matrícula sin indicar`;
       alerts.push(message);

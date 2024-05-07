@@ -47,7 +47,7 @@ export async function AddItinerary(fields: Record<string, any>) {
 }
 
 
-export function formatAlerts(records: any[], type: number) {
+export async function formatAlerts(records: any[], type: number) {
   const alerts: any = [];
 
   records.forEach((element) => {

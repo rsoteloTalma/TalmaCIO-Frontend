@@ -1,4 +1,3 @@
-
 import { callAPI } from "../../shared/network";
 
 
@@ -9,7 +8,6 @@ export async function getItineraryFilters() {
 
   return data.data || [];
 }
-
 
 export async function getItineraryRecords(filters: Record<string, any>) {
   for (const key in filters) {
@@ -34,6 +32,14 @@ export async function getItineraryRecords(filters: Record<string, any>) {
     "Itinerary/GetItinerary", "post");
 
   return data.data || [];
+}
+
+export async function deleteItinerary(params: Record<string, any>) {
+  const data = await callAPI(
+    params,
+    "Itinerary/DeleteByElementItineraryId", "delete");
+
+  return true;
 }
 
 const capitalizeKeys = (obj: any) => {

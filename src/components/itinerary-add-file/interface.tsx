@@ -11,7 +11,7 @@ export interface ItineraryData {
   AirlineIATA: string;
   ServiceType: string;
   Registration: string;
-  AircraftType: string;
+  AircraftType: string | null;
   Origin: string;
   IncomingFlight: string;
   Destiny: string;

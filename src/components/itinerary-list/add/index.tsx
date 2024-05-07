@@ -134,8 +134,9 @@ const ItineraryAdd: React.FC<AddProps> = ({ open, handleClose, dataFilters, hand
               <Autocomplete
                 id="simple-base"
                 options={(dataFilters?.airports ?? []) as filterData[]}
-                // options={user.setAirports ?? []}
                 getOptionLabel={(option) => option?.description ?? "" }
+                //options={user.setAirports ?? []}
+                //getOptionLabel={(option: any) => option?.code ?? "" }
                 renderInput={(params) => (
                   <TextField {...params} label="Base" placeholder="Seleccionado(s)" size="small" />
                 )}
