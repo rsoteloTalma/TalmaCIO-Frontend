@@ -3,22 +3,14 @@ import axios from "axios";
 
 export async function changePasswordUser(password: string, setMessage: (message: string | null) => void, setOpen: (open: boolean) => void, key: string) {
   const parameters = {
-    Password: password,
-    Key: key
+    password: password,
+    passwordChangeKey: key
   }
 
   try {
-    // const response = await axios.post(
-    //   SERVICE_URLS.ROOT + "Security/updatePassword",
-    //   JSON.stringify(parameters), {
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //     "Accept": "application/json"
-    //   }
-    // });
 
     const response = await axios.post(
-      SERVICE_URLS.ROOT + "resetPass",
+      SERVICE_URLS.ROOT + "Authenticator/PasswordChange",
       JSON.stringify(parameters), {
       headers: {
           "Content-Type": "application/json",

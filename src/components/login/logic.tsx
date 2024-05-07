@@ -1,4 +1,4 @@
-import { login } from "../../shared/auth-service";
+import { login, requestPasswordChange } from "../../shared/auth-service";
 
 export async function validateUser(user: string | null, password: string | null, isRecoverPassword: boolean, setMessage: (message: string | null) => void, setOpen: (open: boolean) => void) {
 
@@ -38,5 +38,17 @@ export async function validateUser(user: string | null, password: string | null,
 
     setMessage(result.message);
     setOpen(true);
+  }
+}
+
+export async function RecoveryPassword(user: string | null, isRecoverPassword: boolean, setMessage: (message: string | null) => void, setOpen: (open: boolean) => void) {
+  const result = await requestPasswordChange(user as string, isRecoverPassword);
+
+  if (result) {
+    if(result.success) {
+      const m = "Se envió un correo con las instrucciones a la siguiente dirección: " + result.email + ".";
+      setMessage(m);
+      setOpen(true);
+    }
   }
 }

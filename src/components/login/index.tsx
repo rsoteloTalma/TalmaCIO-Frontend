@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import { paperStyles, loginStyles, linkStyles } from "./styles";
 import { BUTTONS, MESSAGES } from "../../shared/constants";
-import { validateUser } from "./logic";
+import { validateUser, RecoveryPassword } from "./logic";
 import AcceptDialog from "../accept-modal";
 
 const Login: React.FC = () => {
@@ -90,7 +90,7 @@ const Login: React.FC = () => {
             variant="body2"
             onClick={() => {
               setLoading(true);
-              validateUser(login, "", true, setMessage, setOpen);
+              RecoveryPassword(login, true, setMessage, setOpen);
             }}
           >
             ¿Olvidó su Clave?

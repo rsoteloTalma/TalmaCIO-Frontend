@@ -20,6 +20,7 @@ const UpdatePassword = () => {
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState<string | null>("");
   const { key } = useParams();
+  const [loading, setLoading] = useState<boolean>(false);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -70,8 +71,9 @@ const UpdatePassword = () => {
             fullWidth
             color="primary"
             variant="contained"
-            disabled={!showButton()}
+            disabled={!showButton()||loading}
             onClick={() => {
+              setLoading(true);
               changePasswordUser(
                 password,
                 setMessage,
@@ -79,7 +81,7 @@ const UpdatePassword = () => {
                 key ?? "");
             }}
           >
-            {BUTTONS.CHANGE_PASSWORD_USER}
+            {loading ? "Cargando..." : BUTTONS.CHANGE_PASSWORD_USER} 
           </Button>
         </FormControl>
       </Paper>
