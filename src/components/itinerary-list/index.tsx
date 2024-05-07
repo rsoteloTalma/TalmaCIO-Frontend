@@ -1,43 +1,62 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { Avatar, Button, CardHeader, Divider, Grid, IconButton, Paper, TextField, Tooltip, Typography } from "@mui/material";
 import { Add, FilterAlt, LocalAirport, Refresh, SaveAlt } from "@mui/icons-material";
 
 import { AgGridReact } from "ag-grid-react";
-import { GridApi } from "ag-grid-community";
+import { GridApi, IRowNode } from "ag-grid-community";
+import { AG_GRID_LOCALE_ES } from "../../shared/locale";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 
 import moment from "moment-timezone";
 
 import { getUser } from "../../shared/auth-service";
-import { filterAll } from "./interface";
-import { getItineraryFilters, getItineraryRecords } from "./logic";
+import { filterAll, filterData } from "./interface";
+import { getItineraryFilters, getItineraryRecords, deleteItinerary } from "./logic";
 
-import ItineraryFilters from "./filters";
 import ItineraryAdd from "./add";
+import ItineraryDetails from "./details";
+import ItineraryFilters from "./filters";
+
 import BackDrop from "../../shared/fragments/backdrop";
-import SplitButton from "../../shared/fragments/split-button";
+import SplitButton from "../../shared/fragments/split-button-itinerary";
 import MessageSnackbar from "../../shared/fragments/message-snackbar";
+import MenuConfig from "../../shared/fragments/menu-config-itinerary";
+import ItineraryTransfer from "./transfer";
+import AcceptDialog from "../accept-modal";
 
 const user = getUser();
 
 const ItineraryList: React.FC = () => {
-  const myBase = (user && user.operationAirportId == 27) ? 3 : user.operationAirportId;
+  const [myBase] = useState((user && user.operationAirportId == 27) ? 3 : user.operationAirportId);
 
   const [rowData, setRowData] = useState<any[]>([]);
   const [filters, setFilters] = useState<filterAll>();
   const [loading, setLoading] = useState<boolean>(true);
   const [openFilters, setOpenFilters] = useState<boolean>(false);
   const [params, setParams] = useState<Record<string, any>>({});
+  const [deleteId, setDeleteId] = useState<number>(0);
   const [load, setLoad] = useState<boolean>(false);
 
   const [gridApi, setGridApi] = useState<GridApi | null>(null);
 
-  //const [openDetails, setOpenDetails] = useState<boolean>(false);
+  const [openDetails, setOpenDetails] = useState<boolean>(false);
+  const [details, setDetails] = useState<any[]>([]);
 
   const [openNew, setOpenNew] = useState<boolean>(false);
-  const [openAlert, setOpenAlert] = useState<boolean>(false);
+  const [openMessage, setOpenMessage] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
+
+  const [openAlert, setOpenAlert] = useState<boolean>(false);
+
+  const [openTrasfer, setOpenTrasfer] = useState<boolean>(false);
+  const [selectedTrasfer, setSelectedTrasfer] = useState<any[]>([]);
+
+  // config grid
+  const [prepare, setPrepare] = useState<boolean>(false);
+  const [selection, setSelection] = useState<boolean>(false);
+  const [dataConfig, setDataConfig] = useState<any>({prepare: prepare, selection: selection});
+  const gridRef = useRef<AgGridReact>(null);
 
   const startOfDay = moment().tz("America/Bogota").startOf("day").format();
   const endOfDay = moment().tz("America/Bogota").endOf("day").format();
@@ -47,8 +66,10 @@ const ItineraryList: React.FC = () => {
     async function fetchData() {
       if (loading) {
         try {
-          const filterList = await getItineraryFilters();
-          setFilters(filterList);
+          if(filters === undefined){
+            const filterList = await getItineraryFilters();
+            setFilters(filterList);
+          }
 
           const dataParams = {
             Start: startOfDay,
@@ -59,6 +80,10 @@ const ItineraryList: React.FC = () => {
           const recordsList = await getItineraryRecords(dataParams);
           setRowData(recordsList.data);
           setLoading(false);
+
+          // setTimeout(() => {
+          //   setOpenMessage(false);
+          // }, 5500);
 
         } catch (error) {
           setLoading(false);
@@ -87,15 +112,10 @@ const ItineraryList: React.FC = () => {
     fetchData();
   }, [load]);
 
-  const handleDrawer = () => {
-    setOpenFilters(!openFilters);
-  }
 
+  // Load
   const handleLoad = (filterData: Record<string, any>) => {
-    if(filterData.base.length < 1){
-      const myBase = user.setAirports.find((bId: any) => bId.id === user.operationAirportId);
-      filterData.base.push(myBase);
-    }
+    if(filterData.base.length < 1){ filterData.base.push({id: myBase}); }
 
     filterData.Start = moment(String(filterData.startDate)).tz("America/Bogota").startOf("day").format();
     filterData.End = moment(String(filterData.endDate)).tz("America/Bogota").endOf("day").format();
@@ -108,11 +128,18 @@ const ItineraryList: React.FC = () => {
     setOpenFilters(false);
   };
 
+
+  // Filter
+  const handleDrawer = () => {
+    setOpenFilters(!openFilters);
+  }
+
   const handleReload = () => {
     setLoading(true);
   }
 
-  // New Itineraty
+
+  // Add Itineraty
   const handleOpenAdd = () => {
     setOpenNew(!openNew);
   }
@@ -131,9 +158,57 @@ const ItineraryList: React.FC = () => {
       }
     }
     setMessage(message);
-    setOpenAlert(true);
+    setOpenMessage(true);
     setLoading(true);
   }
+
+
+  // Details
+  const handleOpenDetail = () => {
+    setOpenDetails(!openDetails);
+  }
+
+  const handleDetailData = (data: any) => {
+    setDetails(data);
+    handleOpenDetail();
+  }
+
+  const handleDeleteDetail = (data: any) => {
+    setOpenAlert(true);
+    setDeleteId(data.itineraryElementId);
+  }
+
+  const handleDelete = async () => {
+    setOpenAlert(false);
+    const delItinerary = await deleteItinerary({
+      elementItineraryId: deleteId,
+      user: user.employeeId
+    });
+
+    setMessage("Se elimino el registro de itinerario");
+    setLoading(true);
+    setOpenMessage(true);
+  }
+
+
+  // Transfer
+  const handleOpenTrasfer = () => {
+    if(selectedTrasfer.length < 1){
+      alert("Sin Vuelos");
+      return false;
+    }
+
+    setOpenTrasfer(!openTrasfer);
+  }
+
+  const handleTransfer = (data: any) => {
+    setOpenTrasfer(!openTrasfer);
+    setMessage("Transferencia completa.");
+    setOpenMessage(true);
+    setLoading(true);
+    setSelectedTrasfer([]);
+  }
+
 
   // AgGrid
   const onGridReady = (params: { api: GridApi }) => {
@@ -144,15 +219,76 @@ const ItineraryList: React.FC = () => {
     if (gridApi) { gridApi.setGridOption("quickFilterText", event.target.value); }
   };
 
-  // additional column functions
+  const handleExport = useCallback(() => {
+    gridRef.current!.api.exportDataAsCsv();
+  }, []);
+
+
+  const localeText = useMemo<{ [key: string]: string; }>(() => {
+    return AG_GRID_LOCALE_ES;
+  }, []);
+
+
+  // Additional column functions
   const formatDate = (params: any) => {
     return moment.tz(params, "America/Bogota").format("YYYY-MM-DD HH:mm");
   };
 
+  const formatCompany = (params: any) => {
+    const dataFilters = (filters?.airlines ?? []) as filterData[];
+    const myCompany = dataFilters.find((company: any) => company.id === params);
+    return myCompany?.extra;
+  };
+
+  const formatLogo = (params: any) => {
+    return (
+      <span style={{ display: "flex", justifyContent: "center", alignItems: "center", marginTop: 6}} >
+        {params.value && (
+          <img
+            alt={`${params.value} Flag`}
+            src={`https://content.airhex.com/content/logos/airlines_${params.value}_23_23_s.png`}
+          />
+        )}
+      </span>
+    );
+  };
+
+  const handleConfigAction = (data: any) => {
+    if(data.prepare != undefined){ setPrepare(!data.prepare); }
+    if(data.selection != undefined){ setSelection(data.selection); }
+    setDataConfig(data);
+  };
+
+  const isRowSelectable = useCallback((params: IRowNode<any>) => {
+    return !!params.data && params.data.serviceHeaderId === null;
+  }, []);
+
+  const onSelectionChanged = (event: any) => {
+    const selectedRows = event.api.getSelectedRows();
+    setSelectedTrasfer(selectedRows);
+  };
+
   const columnData: any = [
-    { headerName: "Id", field: "itineraryElementId", width: 110, resizable: false },
+    //{ headerName: "Preparar", field: "preparar", hide: !prepare },
+    {
+      headerName: "Id",
+      field: "itineraryElementId",
+      width: 125,
+      resizable: false,
+      headerCheckboxSelection: true,
+      headerCheckboxSelectionFilteredOnly: true,
+      checkboxSelection: true,
+      showDisabledCheckboxes: false,
+    },
     { headerName: "Base", field: "base.description", width: 120 },
-    { headerName: "Compañia", field: "company.description" },
+    { 
+      headerName: "",
+      field: "company.description",
+      cellRenderer: formatLogo,
+      width: 50,
+      filter: false
+    },
+    { headerName: "Compañía", field: "company.id", valueFormatter: (p: any) => formatCompany(p.value) },
     { headerName: "Origen", field: "origin.description", width: 100 },
     { headerName: "Núm. Vuelo", field: "incomingFlight", width: 130 },
     { headerName: "ETA", field: "sta", valueFormatter: (p: any) => formatDate(p.value) },
@@ -160,14 +296,22 @@ const ItineraryList: React.FC = () => {
     { headerName: "Núm. Vuelo", field: "outgoingFlight", width: 130 },
     { headerName: "ETD", field: "std", valueFormatter: (p: any) => formatDate(p.value) },
     { headerName: "Servicio", field: "serviceType.description" },
+    { headerName: "Cód.CIO", field: "serviceHeaderId" },
     { 
       headerName: "Actions", 
       field: "actions", 
       cellRenderer: SplitButton,
+      cellRendererParams: {
+        handleDetail: handleDetailData
+      },
       width: 130,
       resizable: false
     }
   ];
+
+  if(openMessage){
+    setTimeout(() => { setOpenMessage(false); }, 5500);
+  }
 
   if (loading) return (<BackDrop />);
   if (load) return (<BackDrop />);
@@ -189,7 +333,29 @@ const ItineraryList: React.FC = () => {
         handleAdd={handleAdd}
       />
 
-      { openAlert && <MessageSnackbar message={message} /> }
+      <ItineraryDetails
+        open={openDetails}
+        handleClose={setOpenDetails}
+        data={details}
+        handleDelete={handleDeleteDetail}
+      />
+
+      { openMessage && <MessageSnackbar message={message} /> }
+
+      { openTrasfer && <ItineraryTransfer
+          data={selectedTrasfer}
+          handleTransferSave={handleTransfer}
+          handleTransferClose={handleOpenTrasfer}
+        />
+      }
+
+      { openAlert && <AcceptDialog
+        handleAccept={handleDelete}
+        handleClose={() => setOpenAlert(false)}
+        dialogContentText={"¿Confirma eliminar el registro de itinerario?"}
+        dialogTitle={"Eliminar Itinerario"}
+        open={openAlert}
+      />}
 
       <Grid container sx={{ background: "#FAFAFA" }} paddingX={2}>
         <Grid item xs={12}>
@@ -209,7 +375,7 @@ const ItineraryList: React.FC = () => {
           />
         </Grid>
 
-        <Grid item xs={8} mt={1}>
+        <Grid item xs={7} md={8} mt={1}>
           <Button
             startIcon={<Add />}
             sx={{borderRadius: 10, bgcolor: "#FFFFFF" }}
@@ -218,12 +384,20 @@ const ItineraryList: React.FC = () => {
           >
             Agregar
           </Button>
+
+          <Button
+            sx={{borderRadius: 10, bgcolor: "#FFFFFF" }}
+            variant="outlined"
+            onClick={handleOpenTrasfer}
+          >
+            Transfer
+          </Button>
         </Grid>
 
-        <Grid item xs={4} justifyItems={"end"}>
+        <Grid item xs={5} md={4} justifyItems={"end"}>
           <Paper
             component="form"
-            sx={{ p: "2px 4px", display: "flex", alignItems: "center", width: 400, borderRadius: 10, justifyContent: "space-between" }}
+            sx={{ p: "2px 4px", display: "flex", alignItems: "center", width: "100%", borderRadius: 10, justifyContent: "space-between" }}
           >
             <Tooltip title="Reestablecer datos">
               <IconButton sx={{ p: "10px" }} aria-label="refresh" onClick={handleReload}>
@@ -250,10 +424,15 @@ const ItineraryList: React.FC = () => {
             <Divider sx={{ height: 28, marginX: 1 }} orientation="vertical" />
 
             <Tooltip title="Descargar">
-              <IconButton sx={{ p: "10px" }} aria-label="save" color="success" >
+              <IconButton sx={{ p: "10px" }} aria-label="save" color="success" onClick={handleExport} >
                 <SaveAlt />
               </IconButton>
             </Tooltip>
+
+            <MenuConfig
+              params={dataConfig}
+              handleConfigAction={handleConfigAction}
+            />
           </Paper>
         </Grid>
 
@@ -265,14 +444,20 @@ const ItineraryList: React.FC = () => {
             style={{ height: 500 }}
           >
             <AgGridReact
+              ref={gridRef}
               rowData={rowData}
               columnDefs={columnData}
               onGridReady={onGridReady}
+              localeText={localeText}
               defaultColDef={{
                 sortable: true,
-                filter: true,
-                //flex: 1,
+                filter: true
               }}
+              enableCellTextSelection={selection}
+              suppressRowClickSelection={true}
+              rowSelection={"multiple"}
+              isRowSelectable={isRowSelectable}
+              onSelectionChanged={onSelectionChanged}
             />
           </div>
         </Grid>

@@ -4,7 +4,11 @@ import { AirplaneTicket, ArrowDropDown } from "@mui/icons-material";
 
 import { ICellRendererParams } from "ag-grid-community";
 
-const SplitButton: React.FC<ICellRendererParams> = (props) => {
+interface SplitButtonProps extends ICellRendererParams {
+  handleDetail: (data: any) => void;
+}
+
+const SplitButton: React.FC<SplitButtonProps> = ({ data, handleDetail }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
@@ -16,10 +20,10 @@ const SplitButton: React.FC<ICellRendererParams> = (props) => {
     setAnchorEl(null);
   };
 
-  const handleAction1Click = () => {
+  const handleLoadDetail = () => {
+    data.action = 1;
+    handleDetail(data);
     handleClose();
-    console.log("Action 1:", props.data);
-    // Aquí puedes realizar acciones adicionales con los datos de la fila.
   };
 
   return (
@@ -28,7 +32,7 @@ const SplitButton: React.FC<ICellRendererParams> = (props) => {
       <Button
         key="details"
         aria-controls="details"
-        // onClick={}
+        onClick={handleLoadDetail}
         color="primary"
       >
         <AirplaneTicket />
@@ -37,6 +41,7 @@ const SplitButton: React.FC<ICellRendererParams> = (props) => {
         key="two"
         aria-controls="simple-menu"
         aria-haspopup="true"
+        onClick={handleClick}
         color="primary"
       >
         <ArrowDropDown />
@@ -51,14 +56,19 @@ const SplitButton: React.FC<ICellRendererParams> = (props) => {
         onClose={handleClose}
         sx={{margin: 0}}
       >
-        <MenuItem onClick={handleAction1Click} sx={{ paddingY: 0}}>
+        <MenuItem onClick={handleClose} sx={{ paddingY: 0}}>
           <Typography variant="overline">
             editar
           </Typography>
         </MenuItem>
         <MenuItem onClick={handleClose} sx={{ paddingY: 0}}>
           <Typography variant="overline">
-            ver
+            boletín
+          </Typography>
+        </MenuItem>
+        <MenuItem onClick={handleClose} sx={{ paddingY: 0}}>
+          <Typography variant="overline">
+            timeline
           </Typography>
         </MenuItem>
       </Menu>      
