@@ -37,7 +37,6 @@ const UpdatePassword = () => {
     return true;
   };
 
-  console.log("key :>> ", key);
   return (
     <Grid>
       {open && <AcceptDialog

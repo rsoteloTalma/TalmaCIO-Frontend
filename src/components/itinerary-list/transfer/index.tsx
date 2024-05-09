@@ -14,22 +14,33 @@ import {
   Paper,
   Divider,
   Alert,
-  AlertTitle
+  CircularProgress,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  IconButton,
+  Tooltip
 } from "@mui/material";
 
-import { Check, Cancel, ConnectingAirports } from "@mui/icons-material";
+import { Check, Cancel, ConnectingAirports, Close } from "@mui/icons-material";
 import { ItineraryTransferProps } from "./interface";
 import { ACTIONS } from "../../../shared/constants";
 
-import { sendItineraryTransfer } from "./logic";
-import BackDrop from "../../../shared/fragments/backdrop";
+import { sendItineraryTransferUnit } from "./logic";
 
 const ItineraryTransfer: React.FC<ItineraryTransferProps> = ({ data, handleTransferSave, handleTransferClose }) => {
 
   const [loading, setLoading] = useState(true);
-  const [load, setLoad] = useState(false);
   const [consolide, setConsolide] = useState<any[]>([]);
   const [sendData, setSendData] = useState<any[]>([]);
+
+  const [transfer, setTransfer] = useState<boolean>(false);
+  const [transferStop, setTransferStop] = useState<boolean>(false);
+  const [transferList, setTransferList] = useState<any[]>([]);
+  const [transferListError, setTransferListError] = useState<any[]>([]);
 
   // prepare sendData
   useEffect(() => {
@@ -71,14 +82,27 @@ const ItineraryTransfer: React.FC<ItineraryTransferProps> = ({ data, handleTrans
   }, [loading]);
 
 
-  const handleSave = async (params: Record<string, any>) => {
-    setLoad(true);
-    const sendTime = await sendItineraryTransfer(params);
-    setLoad(false);
-    handleTransferSave(sendTime);
+  const handleSave = async (params: any[]) => {
+    setTransfer(true);
+
+    for (const element of params) {
+      const send = await sendItineraryTransferUnit(element);
+  
+      setTransferList(transferList => [...transferList, send]);
+
+      if(send.serviceHeaderId === null){
+        setTransferListError(transferListError => [...transferListError, {id: send.elementItineraryId, message: send.errors[0]}]);
+        setTransferStop(true);
+        break;
+      }
+    }
   }
 
-  if (load) return (<BackDrop />);
+  const handleClose = (status: boolean) => {
+    const message = (status) ? "Transferencia completada." : "Verificar errores en transferencia";
+    handleTransferSave([message]);
+    handleTransferClose(false);
+  };
 
   return (
     <>
@@ -112,13 +136,16 @@ const ItineraryTransfer: React.FC<ItineraryTransferProps> = ({ data, handleTrans
         </DialogTitle>
 
         <DialogContent sx={{ pt: 0, bgcolor:"#FAFAFA"}}>
-          <Alert severity="success">
-            <AlertTitle>Atención</AlertTitle>
-            Tras confirmar esta transferencia de itinerario y séan procesados de manera exitosa, los vuelos se verán reflejados en la línea de Tiempo CIO.
+          <Alert severity={(transfer) ? "warning" : "success"} >
+            { transfer ? 
+            "Este proceso puede tardar unos minutos, por favor esperar." : 
+            "Tras confirmar esta transferencia de itinerario y séan procesados de manera exitosa, los vuelos se verán reflejados en la línea de Tiempo CIO."
+            }
           </Alert>
 
           { loading && <LinearProgress /> }
 
+          { !transfer && (
           <Grid container spacing={2} sx={{mt:0}}>
             { consolide.map((items, index) => (
               <Grid item sm={6} md={6} key={index}>
@@ -138,8 +165,67 @@ const ItineraryTransfer: React.FC<ItineraryTransferProps> = ({ data, handleTrans
               </Grid>
             )) }
           </Grid>
+          )}
+
+          { transfer && (
+          <Grid container sx={{ background: "#FAFAFA" }} justifyContent="center" >
+            <Grid item sm={5} md={5} paddingY={2}>
+              <Paper
+                component="form"
+                sx={{ p: "5px 20px", display: "flex", width: "100%", height: "70px", borderRadius: 1, justifyContent: "space-between", alignItems: "center" }}
+              >
+                {
+                  (transferList.length === sendData.length && !transferStop) ? 
+                  <Tooltip title="Completado">
+                    <IconButton sx={{ p: "10px", color: "green" }} aria-label="filter" onClick={() => handleClose(true)}>
+                      <Check />
+                    </IconButton>
+                  </Tooltip> : 
+                  (transferStop) ? 
+                  <Tooltip title="Cerrar">
+                    <IconButton sx={{ p: "10px", color: "red" }} aria-label="filter" onClick={() => handleClose(false)}>
+                      <Close />
+                    </IconButton>
+                  </Tooltip> :
+                  <CircularProgress />
+                }
+
+                <Divider sx={{ height: 40 }} orientation="vertical" />
+
+                <Typography variant="h4">
+                  {transferList.length}
+                </Typography>
+              </Paper>
+            </Grid>
+
+            <Grid item sm={12} md={12}>
+              { transferStop && (
+                <TableContainer component={Paper}>
+                  <Table sx={{ width: "100%" }} size="small" aria-label="a dense table">
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Id</TableCell>
+                        <TableCell align="right">Error</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      <TableRow
+                        key="1"
+                        sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                      >
+                        <TableCell component="th" scope="row">{ transferListError[0].id }</TableCell>
+                        <TableCell align="right">{ transferListError[0].message }</TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              )}
+            </Grid>
+          </Grid>
+          )}
         </DialogContent>
 
+        { !transfer && (
         <DialogActions>
           <Box>
             <Button
@@ -162,6 +248,7 @@ const ItineraryTransfer: React.FC<ItineraryTransferProps> = ({ data, handleTrans
             </Button>
           </Box>
         </DialogActions>
+        )}
       </Dialog>
     </>
   );

@@ -5,12 +5,17 @@ import { blue, blueGrey, red } from "@mui/material/colors";
 
 import { DetailsProps } from "./interface";
 
-const ItineraryDetails: React.FC<DetailsProps> = ({ open, data, handleClose, handleDelete }) => {
+const ItineraryDetails: React.FC<DetailsProps> = ({ open, data, handleClose, handleDelete, handleEdit }) => {
   const sta = data.sta?.split("T");
   const std = data.std?.split("T");
 
-  const handleDeleteItinerary = async (item: number) => {
+  const handleDeleteItinerary = (item: number) => {
     handleDelete({ itineraryElementId: item });
+    handleClose(false);
+  }
+
+  const handleEditItinerary = () => {
+    handleEdit(data);
     handleClose(false);
   }
 
@@ -36,7 +41,7 @@ const ItineraryDetails: React.FC<DetailsProps> = ({ open, data, handleClose, han
 
         <Box>
           <Stack direction="column" alignItems="center" margin={2}>
-            <Avatar sx={{ width: 45, height: 45, bgcolor: '#1A3072' }}>
+            <Avatar sx={{ width: 45, height: 45, bgcolor: "#1A3072" }}>
               <PinDrop />
             </Avatar>
             <ListItemText
@@ -46,8 +51,7 @@ const ItineraryDetails: React.FC<DetailsProps> = ({ open, data, handleClose, han
                 </Typography>
               }
               secondary="Estación"
-              //primaryTypographyProps={{ align: 'center' }}
-              secondaryTypographyProps={{ align: 'center' }}
+              secondaryTypographyProps={{ align: "center" }}
             />
           </Stack>
 
@@ -154,47 +158,49 @@ const ItineraryDetails: React.FC<DetailsProps> = ({ open, data, handleClose, han
               </ListItemButton>
             </ListItem>
 
-            <ListItem
-              dense={true}
-              disablePadding
-              secondaryAction={
-                <IconButton edge="end" aria-label="link">
-                  <KeyboardArrowRight />
-                </IconButton>
-              }
-              sx={{bgcolor: blue[200] }}
-            >
-              <ListItemButton 
-                //onClick={handleClick}
-              >
-                <ListItemAvatar>
-                  <Avatar sx={{ bgcolor: blue[400] }}><EditNote /></Avatar>
-                </ListItemAvatar>
-                <ListItemText primary="EDITAR" secondary="Itinerario" sx={{color: "white"}} />
-              </ListItemButton>
-            </ListItem>
-
             {data.serviceHeaderId === null && (
-            <ListItem
-              divider={true}
-              dense={true}
-              disablePadding
-              secondaryAction={
-                <IconButton edge="end" aria-label="link">
-                  <KeyboardArrowRight />
-                </IconButton>
-              }
-              sx={{bgcolor: red[300] }}
-            >
-              <ListItemButton 
-                onClick={() => handleDeleteItinerary(data.itineraryElementId)}
+              <>
+              <ListItem
+                dense={true}
+                disablePadding
+                secondaryAction={
+                  <IconButton edge="end" aria-label="link">
+                    <KeyboardArrowRight />
+                  </IconButton>
+                }
+                sx={{bgcolor: blue[200] }}
               >
-                <ListItemAvatar>
-                  <Avatar sx={{ bgcolor: red[600] }}><DeleteForever /></Avatar>
-                </ListItemAvatar>
-                <ListItemText primary="ELIMINAR" secondary="Itinerario" sx={{color: "white"}} />
-              </ListItemButton>
-            </ListItem>
+                <ListItemButton 
+                  onClick={handleEditItinerary}
+                >
+                  <ListItemAvatar>
+                    <Avatar sx={{ bgcolor: blue[400] }}><EditNote /></Avatar>
+                  </ListItemAvatar>
+                  <ListItemText primary="EDITAR" secondary="Itinerario" sx={{color: "white"}} />
+                </ListItemButton>
+              </ListItem>
+
+              <ListItem
+                divider={true}
+                dense={true}
+                disablePadding
+                secondaryAction={
+                  <IconButton edge="end" aria-label="link">
+                    <KeyboardArrowRight />
+                  </IconButton>
+                }
+                sx={{bgcolor: red[300] }}
+              >
+                <ListItemButton 
+                  onClick={() => handleDeleteItinerary(data.itineraryElementId)}
+                >
+                  <ListItemAvatar>
+                    <Avatar sx={{ bgcolor: red[600] }}><DeleteForever /></Avatar>
+                  </ListItemAvatar>
+                  <ListItemText primary="ELIMINAR" secondary="Itinerario" sx={{color: "white"}} />
+                </ListItemButton>
+              </ListItem>
+              </>
             )}
           </List>
         </Box>

@@ -78,8 +78,23 @@ export async function processRecords(records: any[], file: File) {
     }
 
     if(element.ETA && element.ETD) {
-      element.ETA = new Date(numberToDate(element.ETA));
-      element.ETD = new Date(numberToDate(element.ETD));
+      if(typeof element.ETA === "string") {
+        const fecha = moment.tz(element.ETA, "YYYY-MM-DD HH:mm", timeZone);
+        if (fecha.isValid()) {
+          element.ETA = fecha.format();
+        }
+      } else {
+        element.ETA = new Date(numberToDate(element.ETA));  
+      }
+
+      if(typeof element.ETD === "string") {
+        const fecha = moment.tz(element.ETD, "YYYY-MM-DD HH:mm", timeZone);
+        if (fecha.isValid()) {
+          element.ETD = fecha.format();
+        }
+      } else {
+        element.ETD = new Date(numberToDate(element.ETD));
+      }
     }
 
     if(element.ETA && (!element.ETD || element.ETD == "Invalid Date")) {
@@ -112,7 +127,6 @@ export async function processRecords(records: any[], file: File) {
       AirlineIATA: element.IATA,
       ServiceType: element.TipoServicio,
       Registration: element.Matricula ?? "",
-      //AircraftType: element.TipoAvion ?? "",
       AircraftType: null,
       Origin: element.Origen ?? "",
       IncomingFlight: String(element.VueloLlegando) ?? "",
@@ -143,6 +157,7 @@ export async function processRecords(records: any[], file: File) {
 
 
 export async function validationFields(records: any[]) {
+  const defaultServiceTypes = ["TRANSITO", "PERNOCTA", "ATENCION CARGUERO", "RETENCION / OMA", "RETENCION/OMA", "RETENCION" ];
   const alerts: any = [];
   const errors: any = [];
 
@@ -169,6 +184,14 @@ export async function validationFields(records: any[]) {
     if (!element.TipoServicio?.trim()) {
       const message = `${row}_Tipo de Servicio sin indicar`;
       errors.push(message);
+
+    } else {
+      const valueType = element.TipoServicio.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+      if (!defaultServiceTypes.map(item => item.toLowerCase()).includes(valueType.toLowerCase())) {
+        const message = `${row}_Tipo de Servicio incorrecto`;
+        errors.push(message);
+      }
     }
 
     if ((!element.VueloLlegando) && (!element.VueloSaliendo)) {

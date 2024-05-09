@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Autocomplete, Avatar, Box, Button, CardHeader, Drawer, Grid, IconButton, List, ListItem, ListItemText, TextField, Typography } from "@mui/material";
-import { Close, ConnectingAirports, FlightLand, FlightTakeoff } from "@mui/icons-material";
+import { Check, Close, FlightLand, FlightTakeoff } from "@mui/icons-material";
 
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
@@ -51,7 +51,7 @@ const ItineraryAdd: React.FC<AddProps> = ({ open, handleClose, dataFilters, hand
   const [loadAirline, setLoadAirline] = useState<number>(0);
   const [loadAirport, setLoadAirport] = useState<number>(0);
 
-  // // load list
+  // load list
   useEffect(() => {
     async function fetchData() {
       if (loadAirline > 0) {
@@ -133,10 +133,8 @@ const ItineraryAdd: React.FC<AddProps> = ({ open, handleClose, dataFilters, hand
             <Grid item sm={6}>
               <Autocomplete
                 id="simple-base"
-                options={(dataFilters?.airports ?? []) as filterData[]}
-                getOptionLabel={(option) => option?.description ?? "" }
-                //options={user.setAirports ?? []}
-                //getOptionLabel={(option: any) => option?.code ?? "" }
+                options={user.setAirports ?? []}
+                getOptionLabel={(option: any) => option?.code ?? "" }
                 renderInput={(params) => (
                   <TextField {...params} label="Base" placeholder="Seleccionado(s)" size="small" />
                 )}
@@ -364,7 +362,7 @@ const ItineraryAdd: React.FC<AddProps> = ({ open, handleClose, dataFilters, hand
           <div style={{ display: "flex", justifyContent: "space-between" }}>
             <Button
               variant="contained"
-              startIcon={<ConnectingAirports />}
+              startIcon={<Check />}
               onClick={() => handleSendData({
                 serviceTypeId,
                 incomingFlight: incomingFlight.trim(),

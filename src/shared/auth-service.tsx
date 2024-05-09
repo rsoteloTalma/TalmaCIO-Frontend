@@ -48,40 +48,37 @@ export const login = async (user: string, password: string, isRecoverPassword: b
                 "Accept": "application/json"
             }
         });
-        console.log(response);
+
         const { data } = response.data;
 
-        if(data){
-                //Verificar si ya realizó cambio de clave por primera vez
+        if(data) {
+            if (data.passwordChange === false) {
+                const responsePasswordChange = await requestPasswordChange(data.employeeId, false); 
 
-                if (data.passwordChange === false) 
-                {
-                   const responsePasswordChange = await requestPasswordChange(data.employeeId, false); 
-
-                   if (responsePasswordChange) {
+                if (responsePasswordChange) {
                     if(responsePasswordChange.success) {
-                      const m = "Este es su primer ingreso, por lo tanto se envió un correo con las instrucciones para activar su clave a la siguiente dirección: " + responsePasswordChange.email + ".";
-                      return { message: m};
+                        const m = "Este es su primer ingreso, por lo tanto se envió un correo con las instrucciones para activar su clave a la siguiente dirección: " + responsePasswordChange.email + ".";
+                        return { message: m};
                     }
-                  }
                 }
+            }
 
-                const date = new Date();
-                date.setDate(date.getDate() + 1);
+            const date = new Date();
+            date.setDate(date.getDate() + 1);
 
-                sessionStorage.setItem("token", data.token);
-                sessionStorage.setItem("user", JSON.stringify(data));
-                sessionStorage.setItem("tokenExpiration", date.toString());
+            sessionStorage.setItem("token", data.token);
+            sessionStorage.setItem("user", JSON.stringify(data));
+            sessionStorage.setItem("tokenExpiration", date.toString());
 
-                if (data.token === null){
-                    return ({
-                        message: data.errorMessage,
-                    });
-                } else {
-                    return ({
-                        message: "Ok",
-                    });
-                }  
+            if (data.token === null){
+                return ({
+                    message: data.errorMessage,
+                });
+            } else {
+                return ({
+                    message: "Ok",
+                });
+            }
 
         }else{
             return {

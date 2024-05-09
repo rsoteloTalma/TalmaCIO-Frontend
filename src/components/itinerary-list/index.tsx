@@ -15,14 +15,15 @@ import { filterAll, filterData } from "./interface";
 import { getItineraryFilters, getItineraryRecords, deleteItinerary } from "./logic";
 
 import ItineraryAdd from "./add";
+import ItineraryEdit from "./edit";
 import ItineraryDetails from "./details";
 import ItineraryFilters from "./filters";
+import ItineraryTransfer from "./transfer";
 
 import BackDrop from "../../shared/fragments/backdrop";
 import SplitButton from "../../shared/fragments/split-button-itinerary";
 import MessageSnackbar from "../../shared/fragments/message-snackbar";
 import MenuConfig from "../../shared/fragments/menu-config-itinerary";
-import ItineraryTransfer from "./transfer";
 import AcceptDialog from "../accept-modal";
 
 const user = getUser();
@@ -52,6 +53,9 @@ const ItineraryList: React.FC = () => {
   const [openTrasfer, setOpenTrasfer] = useState<boolean>(false);
   const [selectedTrasfer, setSelectedTrasfer] = useState<any[]>([]);
 
+  const [openEdit, setOpenEdit] = useState<boolean>(false);
+  const [dataEdit, setDataEdit] = useState<any[]>([]);
+
   // config grid
   const [prepare, setPrepare] = useState<boolean>(false);
   const [selection, setSelection] = useState<boolean>(false);
@@ -80,10 +84,6 @@ const ItineraryList: React.FC = () => {
           const recordsList = await getItineraryRecords(dataParams);
           setRowData(recordsList.data);
           setLoading(false);
-
-          // setTimeout(() => {
-          //   setOpenMessage(false);
-          // }, 5500);
 
         } catch (error) {
           setLoading(false);
@@ -180,7 +180,7 @@ const ItineraryList: React.FC = () => {
 
   const handleDelete = async () => {
     setOpenAlert(false);
-    const delItinerary = await deleteItinerary({
+    await deleteItinerary({
       elementItineraryId: deleteId,
       user: user.employeeId
     });
@@ -188,6 +188,19 @@ const ItineraryList: React.FC = () => {
     setMessage("Se elimino el registro de itinerario");
     setLoading(true);
     setOpenMessage(true);
+  }
+
+
+  // Edit
+  const handleEditDetail = (data: any) => {
+    setDataEdit(data);
+    setOpenEdit(true);
+  };
+
+  const handleEdit = (data: string) => {
+    setMessage(data);
+    setOpenMessage(true);
+    setLoading(true);
   }
 
 
@@ -203,7 +216,7 @@ const ItineraryList: React.FC = () => {
 
   const handleTransfer = (data: any) => {
     setOpenTrasfer(!openTrasfer);
-    setMessage("Transferencia completa.");
+    setMessage(data[0]);
     setOpenMessage(true);
     setLoading(true);
     setSelectedTrasfer([]);
@@ -338,6 +351,7 @@ const ItineraryList: React.FC = () => {
         handleClose={setOpenDetails}
         data={details}
         handleDelete={handleDeleteDetail}
+        handleEdit={handleEditDetail}
       />
 
       { openMessage && <MessageSnackbar message={message} /> }
@@ -356,6 +370,14 @@ const ItineraryList: React.FC = () => {
         dialogTitle={"Eliminar Itinerario"}
         open={openAlert}
       />}
+
+
+      { openEdit && <ItineraryEdit
+        open={openEdit}
+        data={dataEdit}
+        handleClose={setOpenEdit}
+        handleEdit={handleEdit}
+      /> }
 
       <Grid container sx={{ background: "#FAFAFA" }} paddingX={2}>
         <Grid item xs={12}>

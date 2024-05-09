@@ -35,10 +35,7 @@ export async function getItineraryRecords(filters: Record<string, any>) {
 }
 
 export async function deleteItinerary(params: Record<string, any>) {
-  const data = await callAPI(
-    params,
-    "Itinerary/DeleteByElementItineraryId", "delete");
-
+  await callAPI(params, "Itinerary/DeleteByElementItineraryId", "delete");
   return true;
 }
 

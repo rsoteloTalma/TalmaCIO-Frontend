@@ -58,11 +58,6 @@ const SplitButton: React.FC<SplitButtonProps> = ({ data, handleDetail }) => {
       >
         <MenuItem onClick={handleClose} sx={{ paddingY: 0}}>
           <Typography variant="overline">
-            editar
-          </Typography>
-        </MenuItem>
-        <MenuItem onClick={handleClose} sx={{ paddingY: 0}}>
-          <Typography variant="overline">
             boletín
           </Typography>
         </MenuItem>

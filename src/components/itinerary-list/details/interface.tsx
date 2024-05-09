@@ -3,6 +3,7 @@ export interface DetailsProps {
   data: Record<string, any>;
   handleClose: (openStatus: boolean) => void;
   handleDelete: (success: Record<string, number>) => void;
+  handleEdit: (data: Record<string, number>) => void;
 }
 
 export interface DetailsDataProps {
