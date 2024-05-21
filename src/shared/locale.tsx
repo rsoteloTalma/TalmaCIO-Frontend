@@ -101,6 +101,19 @@ export const AG_GRID_LOCALE_ES: Record<string,string> = {
     timeFormatSpacesDDMMMMYYYY: "DD MMMM YYYY",
     timeFormatHHMMSS: "HH:MM:SS",
     timeFormatHHMMSSAmPm: "HH:MM:SS AM/PM",
+
+    // pagination
+    totalRows: "Total Filas",
+    more: "More",
+    to: "a",
+    of: "de",
+    page: "Page",
+    pageLastRowUnknown: "?",
+    nextPage: "Next Page",
+    lastPage: "Last Page",
+    firstPage: "First Page",
+    previousPage: "Previous Page",
+    pageSizeSelectorLabel: "Page Size:",
 }
 
 export const AG_GRID_LOCALE_ZZZ: Record<string, string> = {};

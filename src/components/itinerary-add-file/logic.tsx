@@ -79,18 +79,18 @@ export async function processRecords(records: any[], file: File) {
 
     if(element.ETA && element.ETD) {
       if(typeof element.ETA === "string") {
-        const fecha = moment.tz(element.ETA, "YYYY-MM-DD HH:mm", timeZone);
+        const fecha = moment.tz(element.ETA, "YYYY-MM-DD HH:mm", "GMT");
         if (fecha.isValid()) {
-          element.ETA = fecha.format();
+          element.ETA = new Date(fecha.format());
         }
       } else {
         element.ETA = new Date(numberToDate(element.ETA));  
       }
 
       if(typeof element.ETD === "string") {
-        const fecha = moment.tz(element.ETD, "YYYY-MM-DD HH:mm", timeZone);
+        const fecha = moment.tz(element.ETD, "YYYY-MM-DD HH:mm", "GMT");
         if (fecha.isValid()) {
-          element.ETD = fecha.format();
+          element.ETD = new Date(fecha.format());
         }
       } else {
         element.ETD = new Date(numberToDate(element.ETD));
@@ -122,7 +122,7 @@ export async function processRecords(records: any[], file: File) {
     }
 
     const record: ItineraryData = {
-      ElementId: Number(index+=1),
+      ElementId: Number(index+=2),
       Base: element.Base,
       AirlineIATA: element.IATA,
       ServiceType: element.TipoServicio,
@@ -136,7 +136,7 @@ export async function processRecords(records: any[], file: File) {
       EstimatedTimeDeparture: element.ETD,
       Terminal: element.Terminal != null ? element.Terminal.toString() : "",
       Gate: element.Gate != null ? element.Gate.toString() : "",
-      Conveyor: element.Banda ?? "",
+      Conveyor: element.Banda != null ? element.Banda.toString() : "",
       Observation: element.Observacion ?? "",
       Leaders: Leader
     }
@@ -217,6 +217,16 @@ export async function validationFields(records: any[]) {
       }
       if (!element.ETD) {
         const message = `${row}_Fecha Saliendo sin indicar`;
+        errors.push(message);
+      }
+    }
+
+    if(element.ETA && element.ETD) {
+      const fEta = numberToDate(element.ETA);
+      const fEtd = numberToDate(element.ETD);
+
+      if (fEtd < fEta) {
+        const message = `${row}_ETD menor a ETA`;
         errors.push(message);
       }
     }

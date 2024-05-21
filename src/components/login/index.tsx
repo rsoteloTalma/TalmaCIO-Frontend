@@ -18,6 +18,10 @@ const Login: React.FC = () => {
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
+  const baseUrl = window.location.origin;
+  const logo = `${baseUrl}/logo.png`;
+
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, field: string) => {
     if (e.key === "Enter") {
       e.preventDefault();
@@ -53,7 +57,7 @@ const Login: React.FC = () => {
       <Paper elevation={10} style={paperStyles}>
         <FormControl fullWidth={true} margin="dense">
           <input type="hidden" name="appId" value="1" />
-          <img src="./logo.png" alt="logo" style={loginStyles} />
+          <img src={logo} alt="logo" style={loginStyles} />
           <TextField
             label="Usuario"
             placeholder="Usuario"

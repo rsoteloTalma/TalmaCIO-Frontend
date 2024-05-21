@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
-import { Avatar, Button, CardHeader, Divider, Grid, IconButton, Paper, TextField, Tooltip, Typography } from "@mui/material";
+import { Avatar, AvatarGroup, Button, CardHeader, Divider, Grid, IconButton, Paper, TextField, Tooltip, Typography } from "@mui/material";
 import { Add, FilterAlt, LocalAirport, Refresh, SaveAlt } from "@mui/icons-material";
 
 import { AgGridReact } from "ag-grid-react";
@@ -58,8 +58,9 @@ const ItineraryList: React.FC = () => {
 
   // config grid
   const [prepare, setPrepare] = useState<boolean>(false);
+  const [autoHeight, setAutoHeight] = useState<boolean>(false);
   const [selection, setSelection] = useState<boolean>(false);
-  const [dataConfig, setDataConfig] = useState<any>({prepare: prepare, selection: selection});
+  const [dataConfig, setDataConfig] = useState<any>({prepare: prepare, autoHeight: autoHeight, selection: selection});
   const gridRef = useRef<AgGridReact>(null);
 
   const startOfDay = moment().tz("America/Bogota").startOf("day").format();
@@ -266,8 +267,28 @@ const ItineraryList: React.FC = () => {
     );
   };
 
+  const stringAvatar = (name: string) => {
+    const initials = name.split(" ").map((word) => word[0]).join("");
+    return initials.toUpperCase();
+  }
+
+  const formatLeaders = (params: any[]) => {
+    if(params.length < 1) { return ""; }
+
+    return (
+      <span style={{ display: "flex", justifyContent: "center", alignItems: "center", marginTop: 3}} >
+        <AvatarGroup max={3}>
+        { params.map((lead, index) => (
+          <Avatar key={index} alt={lead.name} sx={{ width: 30, height: 30, bgcolor: "#8DBB36", fontSize: 14 }}>{stringAvatar(lead.name)}</Avatar>
+        )) }
+        </AvatarGroup>
+      </span>
+    );
+  };
+
   const handleConfigAction = (data: any) => {
     if(data.prepare != undefined){ setPrepare(!data.prepare); }
+    if(data.autoHeight != undefined){ setAutoHeight(!data.autoHeight); }
     if(data.selection != undefined){ setSelection(data.selection); }
     setDataConfig(data);
   };
@@ -310,6 +331,14 @@ const ItineraryList: React.FC = () => {
     { headerName: "ETD", field: "std", valueFormatter: (p: any) => formatDate(p.value) },
     { headerName: "Servicio", field: "serviceType.description" },
     { headerName: "Cód.CIO", field: "serviceHeaderId" },
+    {
+      headerName: "Asignación",
+      field: "leaders",
+      cellRenderer: (p: any) => formatLeaders(p.value),
+      width: 140,
+      filter: false,
+      suppressCsvExport: true
+    },
     { 
       headerName: "Actions", 
       field: "actions", 
@@ -318,7 +347,8 @@ const ItineraryList: React.FC = () => {
         handleDetail: handleDetailData
       },
       width: 130,
-      resizable: false
+      resizable: false,
+      filter: false
     }
   ];
 
@@ -463,7 +493,7 @@ const ItineraryList: React.FC = () => {
 
           <div
             className="ag-theme-quartz"
-            style={{ height: 500 }}
+            style={{ height: 600 }}
           >
             <AgGridReact
               ref={gridRef}
@@ -480,6 +510,9 @@ const ItineraryList: React.FC = () => {
               rowSelection={"multiple"}
               isRowSelectable={isRowSelectable}
               onSelectionChanged={onSelectionChanged}
+              domLayout={autoHeight ? "autoHeight" : "normal"}
+              pagination={true}
+              paginationPageSize={50}
             />
           </div>
         </Grid>

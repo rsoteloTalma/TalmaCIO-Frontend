@@ -13,17 +13,25 @@ import ItineraryList from "../components/itinerary-list";
 interface AppRoutesProps { user: any; }
 
 const AppRoutes: React.FC<AppRoutesProps> = ({ user }) => {
+
+  const verifyOption = (rolId: number) => {
+    if(!user) { return false; }
+    return user?.roles.some((x: any) => x.id === rolId || rolId === 0);
+  };
+
   return (
     <Routes>
         <Route path="/" element={!user ? <Login /> :<Home />}/>
         <Route path="/resetPassword/:key" element={<ResetPassword />}/>
         <Route path="/changePassword/:key" element={<UpdatePassword />}/>
-        <Route path="/home" element={<Home />} />
+        <Route path="/home" element={!user ? <Login /> : <Home /> } />
 
-        <Route path="/itinerary/addFile" element={<ItineraryAddFile />} />
-        <Route path="/itinerary/list" element={<ItineraryList />} />
+        <Route path="/itinerary/addFile" 
+          element={!user ? <Login /> : verifyOption(26) && <ItineraryAddFile /> } />
 
-        <Route path="/overtime" element={<Home />} />
+        <Route path="/itinerary/list"
+          element={!user ? <Login /> : verifyOption(30) && <ItineraryList /> } />
+
         <Route path="/componentTest" element={<ComponentTest />} />
     </Routes>
   );

@@ -12,6 +12,7 @@ interface ConfigProps {
 const MenuConfig: React.FC<ConfigProps> = ({ params, handleConfigAction }) => {
 
   const [prepare, setPrepare] = useState<boolean>(params.prepare);
+  const [autoHeight, setAutoHeight] = useState<boolean>(params.autoHeight);
   const [selection, setSelection] = useState<boolean>(params.selection);
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -28,6 +29,11 @@ const MenuConfig: React.FC<ConfigProps> = ({ params, handleConfigAction }) => {
   const handlePrepare = () => {
     setPrepare(!prepare);
     handleConfigAction({prepare});
+  };
+
+  const handleAutoHeight = () => {
+    setAutoHeight(!autoHeight);
+    handleConfigAction({autoHeight: autoHeight});
   };
 
   const handleSelection = () => {
@@ -59,9 +65,9 @@ const MenuConfig: React.FC<ConfigProps> = ({ params, handleConfigAction }) => {
       >
         <MenuItem>
           <FormControlLabel
-            checked={prepare}
-            control={<Switch color="primary" size="small" onClick={handlePrepare} />}
-            label="Preparar"
+            checked={autoHeight}
+            control={<Switch color="primary" size="small" onClick={handleAutoHeight} />}
+            label="Listar"
             labelPlacement="end"
           />
         </MenuItem>
