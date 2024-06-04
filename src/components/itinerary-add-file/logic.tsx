@@ -179,6 +179,11 @@ export async function validationFields(records: any[]) {
     if (!element.IATA?.trim()) {
       const message = `${row}_Aerolínea sin indicar`;
       errors.push(message);
+    } else {
+      if(element.IATA.trim().length > 2){
+        const message = `${row}_Código IATA incorrecto`;
+        errors.push(message);
+      }
     }
 
     if (!element.TipoServicio?.trim()) {
@@ -194,11 +199,6 @@ export async function validationFields(records: any[]) {
       }
     }
 
-    if ((!element.VueloLlegando) && (!element.VueloSaliendo)) {
-      const message = `${row}_Vuelo Llegada y Salida sin indicar`;
-      errors.push(message);
-    }
-    
     if (element.Origen?.trim()) {
       if (!element.VueloLlegando) {
         const message = `${row}_Vuelo Llegando sin indicar`;
@@ -217,6 +217,25 @@ export async function validationFields(records: any[]) {
       }
       if (!element.ETD) {
         const message = `${row}_Fecha Saliendo sin indicar`;
+        errors.push(message);
+      }
+    }
+
+    if ((!element.VueloLlegando) && (!element.VueloSaliendo)) {
+      const message = `${row}_Vuelo Llegada y Salida sin indicar`;
+      errors.push(message);
+    }
+
+    if (element.VueloLlegando) {
+      if (!element.Origen?.trim()) {
+        const message = `${row}_Origen sin indicar`;
+        errors.push(message);
+      }
+    }
+
+    if (element.VueloSaliendo) {
+      if (!element.Destino?.trim()) {
+        const message = `${row}_Destino sin indicar`;
         errors.push(message);
       }
     }
@@ -255,6 +274,20 @@ export async function validationFields(records: any[]) {
     if(!element.ETD || element.ETD == "Invalid Date") {
       const message = `${row}_ETD sin indicar`;
       alerts.push(message);
+    }
+
+    if (element.Origen?.trim()) {
+      if (element.VueloLlegando.length > 4) {
+        const message = `${row}_Núm. Vuelo Llegando fuera de estándar`;
+        alerts.push(message);
+      }
+    }
+
+    if (element.Destino?.trim()) {
+      if (element.VueloSaliendo.length > 4) {
+        const message = `${row}_Núm. Vuelo Saliendo fuera de estándar`;
+        alerts.push(message);
+      }
     }
   });
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
-import { Avatar, AvatarGroup, Button, CardHeader, Divider, Grid, IconButton, Paper, TextField, Tooltip, Typography } from "@mui/material";
-import { Add, FilterAlt, LocalAirport, Refresh, SaveAlt } from "@mui/icons-material";
+import { Avatar, AvatarGroup, Button, ButtonGroup, CardHeader, Divider, Grid, IconButton, Paper, TextField, Tooltip, Typography } from "@mui/material";
+import { Add, ConnectingAirports, FilterAlt, LocalAirport, Refresh, SaveAlt } from "@mui/icons-material";
 
 import { AgGridReact } from "ag-grid-react";
 import { GridApi, IRowNode } from "ag-grid-community";
@@ -279,7 +279,7 @@ const ItineraryList: React.FC = () => {
       <span style={{ display: "flex", justifyContent: "center", alignItems: "center", marginTop: 3}} >
         <AvatarGroup max={3}>
         { params.map((lead, index) => (
-          <Avatar key={index} alt={lead.name} sx={{ width: 30, height: 30, bgcolor: "#8DBB36", fontSize: 14 }}>{stringAvatar(lead.name)}</Avatar>
+          <Avatar key={index} alt={lead.name} sx={{ width: 30, height: 30, bgcolor: "#8DBB36", fontSize: 12 }}>{stringAvatar(lead.name)}</Avatar>
         )) }
         </AvatarGroup>
       </span>
@@ -401,7 +401,6 @@ const ItineraryList: React.FC = () => {
         open={openAlert}
       />}
 
-
       { openEdit && <ItineraryEdit
         open={openEdit}
         data={dataEdit}
@@ -428,22 +427,22 @@ const ItineraryList: React.FC = () => {
         </Grid>
 
         <Grid item xs={7} md={8} mt={1}>
-          <Button
-            startIcon={<Add />}
-            sx={{borderRadius: 10, bgcolor: "#FFFFFF" }}
-            variant="outlined"
-            onClick={handleOpenAdd}
-          >
-            Agregar
-          </Button>
-
-          <Button
-            sx={{borderRadius: 10, bgcolor: "#FFFFFF" }}
-            variant="outlined"
-            onClick={handleOpenTrasfer}
-          >
-            Transfer
-          </Button>
+          <ButtonGroup variant="outlined" aria-label="Basic button group">
+            <Button
+              startIcon={<Add />}
+              sx={{ borderRadius: 10, bgcolor: "#FFFFFF" }}
+              onClick={handleOpenAdd}
+            >
+              Agregar
+            </Button>
+            <Button
+              startIcon={<ConnectingAirports />}
+              sx={{borderRadius: 10, bgcolor: "#FFFFFF" }}
+              onClick={handleOpenTrasfer}
+            >
+              Transfer
+            </Button>
+          </ButtonGroup>
         </Grid>
 
         <Grid item xs={5} md={4} justifyItems={"end"}>

@@ -1,5 +1,5 @@
 import { SERVICE_URLS } from "./constants";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { getToken, logout } from "./auth-service";
 import moment from "moment";
 
@@ -8,6 +8,17 @@ const evaluateError = (error: any) => {
     throw new Error("Ocurrio un error en el servidor reintente o comunìquese con TI ", error);
 }
 
+const evaluateNotFound = (error: any) => {
+    if (error instanceof AxiosError) {
+        const response = error.response;
+        if (response && response.status >= 400) {
+            alert(`Ocurrio un error, reintente o comuníquese con TI. \n ${response.data.Message ?? ""}`);
+            window.location.reload();
+            return response.data.Errors[0];
+        }
+        // } else if (response && response.status >= 500) { evaluateError(error); }
+    }
+};
 
 export async function callAPI(
     params: any,
@@ -37,9 +48,8 @@ export async function callAPI(
                     params: params
                 });
                 return getResponse.data;
-            } catch (error) {            
-                console.log("Error", error);
-                evaluateError(error);   
+            } catch (error) {
+                evaluateNotFound(error);
             }
         }
 
@@ -58,8 +68,7 @@ export async function callAPI(
                     );
                 return postResponse;
             } catch (error) {            
-                console.log("Error", error);
-                evaluateError(error);   
+                evaluateNotFound(error);
             }
         }
 
@@ -78,8 +87,7 @@ export async function callAPI(
                     );
                 return postResponse;
             } catch (error) {            
-                console.log("Error", error);
-                evaluateError(error);  
+                evaluateNotFound(error);
             }
         }
 
@@ -96,8 +104,7 @@ export async function callAPI(
                 });
                 return deleteResponse;
             } catch (error) {            
-                console.log("->Error", error);
-                evaluateError(error);  
+                evaluateNotFound(error);
             }
         }
     }
