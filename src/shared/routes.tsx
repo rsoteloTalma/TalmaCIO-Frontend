@@ -27,10 +27,10 @@ const AppRoutes: React.FC<AppRoutesProps> = ({ user }) => {
         <Route path="/home" element={!user ? <Login /> : <Home /> } />
 
         <Route path="/itinerary/addFile" 
-          element={!user ? <Login /> : verifyOption(26) && <ItineraryAddFile /> } />
+          element={!user ? <Login /> : verifyOption(29) && <ItineraryAddFile /> } />
 
         <Route path="/itinerary/list"
-          element={!user ? <Login /> : verifyOption(30) && <ItineraryList /> } />
+          element={!user ? <Login /> : verifyOption(31) && <ItineraryList /> } />
 
         <Route path="/componentTest" element={<ComponentTest />} />
     </Routes>
