@@ -29,7 +29,7 @@ const Home = () => {
 
         <Grid item xs={12} md={6}>
           <Grid item xs={12} style={{ marginBottom: 20 }}>
-            <iframe width="100%" height="315" src="https://www.youtube.com/embed/OIs3yE6daWk" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen></iframe>
+            <iframe width="100%" height="400" src="https://www.youtube.com/embed/OIs3yE6daWk" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen></iframe>
           </Grid>
         </Grid>
 
