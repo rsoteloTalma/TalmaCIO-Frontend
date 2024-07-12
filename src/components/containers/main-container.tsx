@@ -10,6 +10,10 @@ const MainComponent: React.FC = () => {
     const navigate = useNavigate();
     const user = getUser();
 
+    const path = window.location.pathname;
+    const pathSeg = path.split("/").filter(segment => segment !== "");
+    const reject = ["resetPassword","changePassword","componentTest"];
+
     useEffect(() => {
         const token = getToken();
 
@@ -29,7 +33,12 @@ const MainComponent: React.FC = () => {
             }
         };
 
-        checkToken();
+        if(pathSeg.length > 0){
+            if(reject.includes(pathSeg[0]) === false){ checkToken(); }
+        } else {
+            checkToken();
+        }
+
     }, [navigate]);
 
     return <Dashboard user={user} />;

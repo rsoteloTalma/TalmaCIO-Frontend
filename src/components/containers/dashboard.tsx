@@ -25,7 +25,8 @@ import {
   ExitToApp,
   ChevronLeft,
   ChevronRight,
-  MenuOpen
+  MenuOpen,
+  Home
 } from "@mui/icons-material";
 
 import * as IconsMaterial from "@mui/icons-material";
@@ -243,6 +244,13 @@ const Dashboard: React.FC<{ user: any }> = ({ user }) => {
             component="nav"
             aria-labelledby="nested-list-subheader"
           >
+
+          <ListItemButton key="A1" onClick={() => handleClickItemOpen(1, 1, "/", "")}>
+            <ListItemIcon>
+              <Home />
+            </ListItemIcon>
+            <ListItemText primary="Home" />
+          </ListItemButton>
 
           {main.map((item, index) => {
             const { id, text, sort, icon, url, subItems } = item;
