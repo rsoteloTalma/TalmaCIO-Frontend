@@ -123,14 +123,14 @@ export async function processRecords(records: any[], file: File) {
 
     const record: ItineraryData = {
       ElementId: Number(index+=2),
-      Base: element.Base,
+      Base: String(element.Base.trim()),
       AirlineIATA: element.IATA,
       ServiceType: element.TipoServicio,
       Registration: element.Matricula ?? "",
       AircraftType: null,
-      Origin: element.Origen ?? "",
+      Origin: String(element.Origen.trim()) ?? "",
       IncomingFlight: String(element.VueloLlegando) ?? "",
-      Destiny: element.Destino ?? "",
+      Destiny: String(element.Destino.trim()) ?? "",
       OutgoingFlight: String(element.VueloSaliendo) ?? "",
       EstimatedTimeArrival: element.ETA,
       EstimatedTimeDeparture: element.ETD,
@@ -170,7 +170,7 @@ export async function validationFields(records: any[]) {
       errors.push(message);
     }
 
-    const baseCheck = user.setAirports.find((item: any) => item.code === element.Base);
+    const baseCheck = user.setAirports.find((item: any) => item.code === element.Base.trim());
     if (!baseCheck) {
       const message = `${row}_Base no permitida`;
       errors.push(message);
