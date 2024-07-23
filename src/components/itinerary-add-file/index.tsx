@@ -158,6 +158,9 @@ const ItineraryAddFile: React.FC = () => {
     { headerName: "Tipo", field: "type", width: 100 },
   ];
 
+  const baseUrl = window.location.origin;
+  const plantilla = `${baseUrl}/docs/ItinerarioPlantillaV1.xlsx`;
+
   if (loading) return (<BackDrop />);
 
   return (
@@ -178,9 +181,11 @@ const ItineraryAddFile: React.FC = () => {
             subheader="Cargue masivo de itinerario"
             sx={{paddingLeft: 0}}
             action={
-              <IconButton aria-label="info">
-                <Info />
-              </IconButton>
+              <a href={plantilla} download="ItinerarioPlantillaV1.xlsx">
+                <IconButton aria-label="info">
+                  <Info />
+                </IconButton>
+              </a>
             }
           />
         </Grid>
