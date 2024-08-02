@@ -62,6 +62,19 @@ export async function segmentList(list: any, max: number) {
 }
 
 
+export async function fireSocket() {
+  const params = {
+    invokedFrom: "TransferItinerary"
+  };
+
+  const data = await callAPI(
+    params,
+    "Planner/Socket", "post");
+
+  return true;
+}
+
+
 export async function transferSimulator(idItinerary: number) {
   return await esperar(idItinerary);
 }

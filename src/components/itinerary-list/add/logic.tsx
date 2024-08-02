@@ -29,6 +29,16 @@ export async function GetConveyorByAirport(id: number) {
   return data.data || {};
 }
 
+
+export async function GetLeadersByAirport(id: number) {
+  const data = await callAPI(
+    {id}, 
+    "Reference/GetLeaderByAirportId", "get");
+
+  return data.data || {};
+}
+
+
 export async function AddItinerary(fields: Record<string, any>) {
   const user: string = fields.user;
   delete fields.user;

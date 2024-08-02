@@ -9,6 +9,7 @@ import UpdatePassword from "../components/update-password";
 
 import ItineraryAddFile from "../components/itinerary-add-file";
 import ItineraryList from "../components/itinerary-list";
+import Planner from "../components/planner";
 
 interface AppRoutesProps { user: any; }
 
@@ -27,10 +28,13 @@ const AppRoutes: React.FC<AppRoutesProps> = ({ user }) => {
         <Route path="/home" element={!user ? <Login /> : <Home /> } />
 
         <Route path="/itinerary/addFile" 
-          element={!user ? <Login /> : verifyOption(26) && <ItineraryAddFile /> } />
+          element={!user ? <Login /> : verifyOption(26) && <ItineraryAddFile /> } /> {/*29*/}
 
         <Route path="/itinerary/list"
-          element={!user ? <Login /> : verifyOption(30) && <ItineraryList /> } />
+          element={!user ? <Login /> : verifyOption(30) && <ItineraryList /> } /> {/*31*/}
+
+        <Route path="/planner"
+          element={!user ? <Login /> : verifyOption(31) && <Planner /> } />
 
         <Route path="/componentTest" element={<ComponentTest />} />
     </Routes>
