@@ -29,7 +29,7 @@ import { Check, Cancel, ConnectingAirports, Close } from "@mui/icons-material";
 import { ItineraryTransferProps } from "./interface";
 import { ACTIONS } from "../../../shared/constants";
 
-import { sendItineraryTransferUnit } from "./logic";
+import { fireSocket, sendItineraryTransferUnit } from "./logic";
 
 const ItineraryTransfer: React.FC<ItineraryTransferProps> = ({ data, handleTransferSave, handleTransferClose }) => {
 
@@ -98,8 +98,10 @@ const ItineraryTransfer: React.FC<ItineraryTransferProps> = ({ data, handleTrans
     }
   }
 
-  const handleClose = (status: boolean) => {
+  const handleClose = async (status: boolean) => {
     const message = (status) ? "Transferencia completada." : "Verificar errores en transferencia";
+    const fire = await fireSocket();
+
     handleTransferSave([message]);
     handleTransferClose(false);
   };

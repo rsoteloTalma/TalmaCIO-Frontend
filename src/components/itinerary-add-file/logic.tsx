@@ -50,7 +50,9 @@ export async function processRecords(records: any[], file: File) {
 
       if(LeadAT.length > 0){
         LeadAT.map((lead: string) => {
-          Leader.push({ EmployeeId: lead.trim(), Type: 96 });
+          if(lead !== ""){
+            Leader.push({ EmployeeId: lead.trim(), Type: 96 });
+          }
         });
       }
     }

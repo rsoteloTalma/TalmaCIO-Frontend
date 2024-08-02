@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { FormEvent, useState } from "react";
 import {
     Paper,
     FormControl,
@@ -44,6 +44,12 @@ const Login: React.FC = () => {
     setOpen(false);
   };
 
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setLoading(true);
+    validateUser(login, password, false, setMessage, setOpen);
+  };
+
   return (
     <>
       {open && <AcceptDialog
@@ -55,51 +61,53 @@ const Login: React.FC = () => {
       />}
 
       <Paper elevation={10} style={paperStyles}>
-        <FormControl fullWidth={true} margin="dense">
-          <input type="hidden" name="appId" value="1" />
-          <img src={logo} alt="logo" style={loginStyles} />
-          <TextField
-            label="Usuario"
-            placeholder="Usuario"
-            value={login || ""}
-            onChange={(e) => setLogin(e.target.value)}
-            fullWidth
-          />
-          <p />
-          <TextField
-            id="password-input"
-            label="Clave"
-            placeholder="Clave"
-            value={password || ""}
-            type="password"
-            onChange={(e) => setPassword(e.target.value)}
-            fullWidth
-          />
-          <p />
-          <Button
-            fullWidth
-            disabled={loading}
-            color="primary"
-            variant="contained"
-            onClick={() => {
-              setLoading(true);
-              validateUser(login, password, false, setMessage, setOpen);
-            }}
-          >
-            {loading ? "Cargando..." : BUTTONS.LOGIN}
-          </Button>
-          <Link
-            style={linkStyles}
-            component="button"
-            variant="body2"
-            onClick={() => {
-              setLoading(true);
-              RecoveryPassword(login, true, setMessage, setOpen);
-            }}
-          >
-            ¿Olvidó su Clave?
-          </Link>
-        </FormControl>
+        <form onSubmit={handleSubmit}>
+          <FormControl fullWidth={true} margin="dense">
+            <input type="hidden" name="appId" value="1" />
+            <img src={logo} alt="logo" style={loginStyles} />
+            <TextField
+              label="Usuario"
+              placeholder="Usuario"
+              value={login || ""}
+              onChange={(e) => setLogin(e.target.value)}
+              fullWidth
+            />
+            <p />
+            <TextField
+              id="password-input"
+              label="Clave"
+              placeholder="Clave"
+              value={password || ""}
+              type="password"
+              onChange={(e) => setPassword(e.target.value)}
+              fullWidth
+            />
+            <p />
+            <Button
+              fullWidth
+              disabled={loading}
+              color="primary"
+              variant="contained"
+              onClick={() => {
+                setLoading(true);
+                validateUser(login, password, false, setMessage, setOpen);
+              }}
+            >
+              {loading ? "Cargando..." : BUTTONS.LOGIN}
+            </Button>
+            <Link
+              style={linkStyles}
+              component="button"
+              variant="body2"
+              onClick={() => {
+                setLoading(true);
+                RecoveryPassword(login, true, setMessage, setOpen);
+              }}
+            >
+              ¿Olvidó su Clave?
+            </Link>
+          </FormControl>
+        </form>
       </Paper>
     </>
   );

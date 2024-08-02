@@ -6,7 +6,7 @@ import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 
 import { Alert, Avatar, Button, CardHeader, Divider, Grid, IconButton, InputBase, List, ListItem, ListItemAvatar, ListItemText, Paper, Tooltip, Typography } from "@mui/material";
-import { Check, Close, Info, LocalAirport, Upload } from "@mui/icons-material";
+import { Check, Close, Download, Info, LocalAirport, Upload } from "@mui/icons-material";
 import { ACTIONS } from "../../shared/constants";
 
 import { processRecords, sendDataFile, validationFields, formatAlerts } from "./logic";
@@ -182,9 +182,9 @@ const ItineraryAddFile: React.FC = () => {
             sx={{paddingLeft: 0}}
             action={
               <a href={plantilla} download="ItinerarioPlantillaV1.xlsx">
-                <IconButton aria-label="info">
-                  <Info />
-                </IconButton>
+                <Button variant="outlined" startIcon={<Download />} color="success" size="small">
+                  XLSX
+                </Button>
               </a>
             }
           />

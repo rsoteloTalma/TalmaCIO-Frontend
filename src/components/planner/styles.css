@@ -1,0 +1,26 @@
+
+.cell-neutro {
+    color: initial;
+}
+
+.cell-green {
+    background-color: lightgreen;
+    color: white;
+}
+  
+.cell-red {
+    background-color: lightcoral;
+    color: white;
+}
+
+.row-updated .dsg-cell {
+    background: lightgoldenrodyellow;
+}
+
+.row-success .dsg-cell {
+    background-color: lightcyan;
+}
+
+.row-danger .dsg-cell {
+    background-color: lightpink;
+}
