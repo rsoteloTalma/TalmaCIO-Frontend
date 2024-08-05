@@ -21,7 +21,7 @@ const Login: React.FC = () => {
   const baseUrl = window.location.origin;
   const logo = `${baseUrl}/logo.png`;
 
-
+// --- revisar enter al acceder
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, field: string) => {
     if (e.key === "Enter") {
       e.preventDefault();
@@ -45,9 +45,9 @@ const Login: React.FC = () => {
   };
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setLoading(true);
-    validateUser(login, password, false, setMessage, setOpen);
+    // event.preventDefault();
+    // setLoading(true);
+    // validateUser(login, password, false, setMessage, setOpen);
   };
 
   return (
@@ -61,7 +61,7 @@ const Login: React.FC = () => {
       />}
 
       <Paper elevation={10} style={paperStyles}>
-        <form onSubmit={handleSubmit}>
+        {/* <form onSubmit={handleSubmit}> */}
           <FormControl fullWidth={true} margin="dense">
             <input type="hidden" name="appId" value="1" />
             <img src={logo} alt="logo" style={loginStyles} />
@@ -107,7 +107,7 @@ const Login: React.FC = () => {
               ¿Olvidó su Clave?
             </Link>
           </FormControl>
-        </form>
+        {/* </form> */}
       </Paper>
     </>
   );
