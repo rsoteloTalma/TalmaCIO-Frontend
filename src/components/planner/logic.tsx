@@ -137,7 +137,6 @@ async function orderData(data: any[]) {
     const ataDate = (item.ata === null) ? staDate: item.ata.split('T');
     const atdDate = (item.atd === null) ? stdDate: item.atd.split('T');
 
-
     const row = {
       serviceHeaderId: item.serviceHeaderId,
       baseId: item.baseId,
@@ -201,7 +200,8 @@ async function orderData(data: any[]) {
       startDate: item.sequences[seq].startDate,
       endDate: item.sequences[seq].endDate,
       startSlot: item.sequences[seq].startSlot,
-      endSlot: item.sequences[seq].endSlot
+      endSlot: item.sequences[seq].endSlot,
+      fullATLeaders: item.sequences.map((seq: any) => seq.ghLeader.replace(/\s*\(.*\)$/, "")).join('#')
     };
 
     retorno.push(row);

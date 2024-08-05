@@ -58,6 +58,7 @@ export interface DataRow {
   serviceTypeStage: string | null;
   ghLeaderId: number | null;
   ghLeader: string | null;
+  fullATLeaders: string | null;
   startDate: string | null;
   endDate: string | null;
 }

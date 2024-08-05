@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useLayoutEffect, useRef, useMemo } from "react";
-import { Avatar, CardHeader, Divider, Grid, IconButton, Paper, TextField, Tooltip, Typography } from "@mui/material";
-import { AirplaneTicket, FilterAlt, Refresh, SaveAlt, Settings } from "@mui/icons-material";
+import { Avatar, CardHeader, Chip, Divider, Grid, IconButton, Paper, TextField, Tooltip, Typography } from "@mui/material";
+import { AirplaneTicket, Face, FilterAlt, NotInterested, Refresh, SaveAlt, Settings } from "@mui/icons-material";
 
 import { DataSheetGrid, textColumn, intColumn, keyColumn, Column, createTextColumn, CellProps, checkboxColumn } from "react-datasheet-grid";
 import "react-datasheet-grid/dist/style.css";
@@ -161,10 +161,10 @@ const Planner: React.FC = () => {
 
           // autoHeight
           if(dataPlanner.length < 15){
-            const elements = document.querySelectorAll<HTMLDivElement>('.dsg-container');
+            const elements = document.querySelectorAll<HTMLDivElement>(".dsg-container");
             if(elements != undefined){
               elements.forEach((element) => {
-                element.style.cssText = '';
+                element.style.cssText = "";
               });
             }
           }
@@ -220,59 +220,6 @@ const Planner: React.FC = () => {
 
 
   // socket
-
-  // useEffect(() => {
-  //   async function fetchUpdateData(myParams: Record<string, any>) {
-  //     try {
-  //       const newPlanner = await getDataPlanner(myParams);
-  //       const itinerary = await orderDataPlanner(newPlanner);
-
-  //       setRowData(itinerary);
-  //       setOriginData(newPlanner);
-  //       setFilteredData(itinerary);
-
-  //     } catch (error) {
-  //       console.log("error :>> ", error);
-  //       setRowData([]);
-  //       return [];
-  //     }
-  //   }
-
-  //   try {
-  //     const urlString: string | undefined = SERVICE_URLS.ROOT;
-  //     let wsUrl = "";
-
-  //     if(urlString){
-  //       const url = new URL(urlString);
-  //       wsUrl = `wss://${url.hostname}:${url.port}`;
-  //     }
-
-  //     const ws = new WebSocket(wsUrl);
-  
-  //     ws.onopen = () => {
-  //       console.log("Connected to WebSocket server");
-  //     };
-  
-  //     ws.onmessage = async (event: MessageEvent) => {
-  //       const message = event.data;
-  //       setSocketMessage(prevMessages => [...prevMessages, message]);
-
-  //       await fetchUpdateData(params);
-  //     };
-  
-  //     ws.onclose = () => {
-  //       console.log("Disconnected from WebSocket server");
-  //     };
-  
-  //     setSocket(ws);
-  //     return () => { ws.close(); };
-
-  //   } catch (e) {
-  //     console.error("Invalid URL WS:", e);
-  //   }
-  // }, [fire]);
-
-
   useEffect(() => {
     async function fetchUpdateData(myParams: Record<string, any>) {
       try {
@@ -363,8 +310,18 @@ const Planner: React.FC = () => {
         (row.incomingFlight?.toLowerCase() ?? "").includes(query) ||
         (row.ghLeader?.toLowerCase() ?? "").includes(query) ||
         (row.sPaxLeader?.toLowerCase() ?? "").includes(query) ||
-        (row.aopLeader?.toLowerCase() ?? "").includes(query)
+        (row.aopLeader?.toLowerCase() ?? "").includes(query) ||
+        (row.fullATLeaders?.toLowerCase() ?? "").includes(query)
     );
+
+    if(filter.length < 10){
+      const elements = document.querySelectorAll<HTMLDivElement>(".dsg-container");
+      if(elements != undefined){
+        elements.forEach((element) => {
+          element.style.cssText = "";
+        });
+      }
+    }
 
     setFilteredData(filter);
   };
@@ -648,7 +605,6 @@ const Planner: React.FC = () => {
   }
 
 
-
   // params data grid
   const getCellClassName = (rowData: { serviceHeaderId: number }) => {
     // console.log("rowData :>> ", rowData);
@@ -742,7 +698,6 @@ const Planner: React.FC = () => {
     }
   };
 
-
   const handleChange = (newValue: DataRow[], operations: Operation[]) => {
     for (const operation of operations) {
       if (operation.type === "UPDATE") {
@@ -757,7 +712,6 @@ const Planner: React.FC = () => {
     filteredDataRef.current = newValue;
     setFilteredData(newValue);
   }
-
 
   const handleEdit = async (data: Record<string, any>) => {
     const updated = await updDataPlanner(data);
@@ -781,12 +735,10 @@ const Planner: React.FC = () => {
     }, 500);
   };
 
-
   const cancel = () => {
     setFilteredData(rowData);
     updatedRowIds.clear();
   }
-
 
   const handleActiveComponent = async (opts: { cell: CellWithId | null }) => {
     const { cell } = opts;
@@ -801,10 +753,22 @@ const Planner: React.FC = () => {
     }
   };
 
+
+  // Leaders
   const LoadLeaders = ({ rowData }: CellProps) => {
-    const newText = rowData.ghLeader.replace(/\s*\(.*\)$/, "");
+    const newText = rowData.fullATLeaders.split("#");
+    const colorChip = ["#F0F0F0", "moccasin", "lightgreen", "lightcyan", "lavender"];
+
     return (
-      <span style={{fontSize: 14}}>{newText.slice(0, 30).trim()}</span>
+      <div style={{ paddingLeft: 5}}>
+      {newText.map((item: string, index: number) => {
+        return (
+          item.trim() === "Sin Asignar"
+            ? <Chip key={index} icon={<NotInterested color="error" />} size="small" label={item} variant="outlined" />
+            : <Chip key={index} icon={<Face />} size="small" label={item.slice(0, 20)} sx={{backgroundColor: colorChip[index] }} />
+        );
+      })}
+      </div>
     );
   };
 
@@ -814,6 +778,11 @@ const Planner: React.FC = () => {
     }
   };
 
+
+  // Download
+  const handleDownload = async () => {
+    console.log("download");
+  };
 
   // Settings
   const handleSettings = () => {
@@ -845,16 +814,15 @@ const Planner: React.FC = () => {
       title: "Base",
       disabled: true,
     },
-    // {
-    //   ...keyColumn<DataRow, "companyLogo">("companyLogo", textColumn),
-    //   title: "Airline",
-    //   component: ({ rowData }) => <img src={rowData.companyLogo ?? ""} alt="airline-logo" />,
-    //   disabled: true,
-    // },
     {
-      ...keyColumn<DataRow, "company">("company", textColumn),
-      title: "Cliente",
-      disabled: true,
+      ...keyColumn<DataRow, "companyLogo">("companyLogo", textColumn),
+      title: "Airline",
+      component: ({ rowData }) => <div style={{ width:"100%", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 20px" }}>
+        <img src={rowData.companyLogo ?? ""} alt="airline-logo" />
+        <span>{rowData.company ?? ""}</span>
+      </div>,
+      cellClassName: "cell-neutro",
+      disabled: true
     },
     {
       ...keyColumn<DataRow, "serviceTypeStage">("serviceTypeStage", textColumn),
@@ -870,7 +838,7 @@ const Planner: React.FC = () => {
       component: (datacell) => AircraftList(datacell),
       disableKeys: true,
       keepFocus: true,
-      minWidth: 130
+      minWidth: 100
     },
     {
       ...keyColumn<DataRow, "incomingCargoValue">("incomingCargoValue", textColumn),
@@ -938,14 +906,19 @@ const Planner: React.FC = () => {
       ...keyColumn<DataRow, "gate">("gate", textColumn),
       title: "Parking Llegada",
       disabled: true,
+      cellClassName: "col-parking-arr"
     },
+    // {
+    //   ...keyColumn<DataRow, "fullATLeaders">("fullATLeaders", textColumn),
+    //   title: "full Leaders",
+    // },
     {
       ...keyColumn<DataRow, "ghLeader">("ghLeader", createTextColumn({
         alignRight: true,
       })),
-      title: "Leader",
+      title: "AT-Líder",
       component: (datacell) => LoadLeaders(datacell),
-      minWidth: 250,
+      minWidth: 400,
       disableKeys: true,
       keepFocus: true
     },
@@ -953,7 +926,7 @@ const Planner: React.FC = () => {
       ...keyColumn<DataRow, "sPaxLeaderId">("sPaxLeaderId", createTextColumn({
         alignRight: true,
       })),
-      title: "PAX-Leader",
+      title: "PAX-Líder",
       component: (datacell) => LeadersList("sPaxLeaderId", "sPaxLeader", "97", datacell),
       disableKeys: true,
       keepFocus: true,
@@ -963,7 +936,7 @@ const Planner: React.FC = () => {
       ...keyColumn<DataRow, "aopLeaderId">("aopLeaderId", createTextColumn({
         alignRight: true,
       })),
-      title: "AOP-Leader",
+      title: "AOP",
       component: (datacell) => LeadersList("aopLeaderId", "aopLeader", "98", datacell),
       disableKeys: true,
       keepFocus: true,
@@ -973,6 +946,7 @@ const Planner: React.FC = () => {
       ...keyColumn<DataRow, "gateDep">("gateDep", textColumn),
       title: "Parking Salida",
       disabled: true,
+      cellClassName: "col-parking-dep"
     },
     {
       ...keyColumn<DataRow, "atdTime">("atdTime", textColumn),
@@ -1114,7 +1088,6 @@ const Planner: React.FC = () => {
               type="text"
               value={searchQuery}
               onChange={handleSearch}
-              //onChange={onFilterTextChange}
               size="small"
               variant="outlined"
               placeholder="Filtro rápido..."
@@ -1123,7 +1096,7 @@ const Planner: React.FC = () => {
             <Divider sx={{ height: 28, marginX: 1 }} orientation="vertical" />
 
             <Tooltip title="Descargar">
-              <IconButton sx={{ p: "10px" }} aria-label="download" color="success">
+              <IconButton sx={{ p: "10px" }} aria-label="download" color="success" onClick={handleDownload}>
                 <SaveAlt />
               </IconButton>
             </Tooltip>

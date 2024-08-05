@@ -1,6 +1,7 @@
 
 .cell-neutro {
     color: initial;
+    background-color: white;
 }
 
 .cell-green {
@@ -23,4 +24,21 @@
 
 .row-danger .dsg-cell {
     background-color: lightpink;
+}
+
+
+/* custom */
+.col-parking-arr {
+    background-color: aliceblue;
+    text-align-last: center;
+}
+
+.col-parking-dep {
+    background-color: aliceblue;
+    text-align-last: center;
+}
+
+.cell-update-time {
+    color: red;
+    font-weight: 700;
 }
