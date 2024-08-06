@@ -23,6 +23,7 @@ import MessageSnackbar from "../../shared/fragments/message-snackbar";
 import PlannerSequences from "./sequences";
 import PlannerSettings from "./settings";
 import { SERVICE_URLS } from "../../shared/constants";
+import { downloadPlanner } from "./export/logic";
 
 // import AcceptDialog from "../accept-modal";
 
@@ -781,8 +782,9 @@ const Planner: React.FC = () => {
 
   // Download
   const handleDownload = async () => {
-    console.log("download");
+    await downloadPlanner(filteredData);
   };
+
 
   // Settings
   const handleSettings = () => {
